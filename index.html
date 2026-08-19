@@ -5,64 +5,149 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Snap & Fit AI</title>
     <style>
-        body { font-family: sans-serif; background: #060913; color: #fff; display: flex; justify-content: center; padding: 20px; }
-        .app-container { width: 100%; max-width: 450px; }
-        .card { background: #121828; padding: 20px; border-radius: 20px; border: 1px solid #333; }
-        input, select { width: 100%; padding: 12px; margin: 8px 0; border-radius: 10px; background: #080c16; color: #fff; border: 1px solid #444; }
-        button { width: 100%; padding: 14px; margin-top: 10px; border-radius: 14px; border: none; background: linear-gradient(135deg, #00ff88, #00d4ff); font-weight: bold; cursor: pointer; }
-        #aiOutput { margin-top: 20px; white-space: pre-wrap; font-size: 13px; color: #ccc; }
+        :root { --bg: #060913; --card-bg: rgba(18, 24, 40, 0.85); --card-border: rgba(255, 255, 255, 0.12); --primary: #00ff88; --accent: #00d4ff; --text: #f8fafc; --gradient-btn: linear-gradient(135deg, #00ff88 0%, #00d4ff 100%); }
+        body { font-family: sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; display: flex; justify-content: center; min-height: 100vh; }
+        .app-container { width: 100%; max-width: 480px; }
+        .card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 24px; padding: 20px; margin-bottom: 16px; box-shadow: 0 8px 32px rgba(0,0,0,0.4); }
+        h2 { font-size: 18px; font-weight: 800; margin-top: 0; margin-bottom: 14px; color: #fff; }
+        label { display: block; font-size: 11px; font-weight: 700; text-transform: uppercase; color: #94a3b8; margin-bottom: 6px; }
+        input, select { width: 100%; padding: 12px 14px; border-radius: 14px; border: 1px solid rgba(255, 255, 255, 0.12); background: rgba(8, 12, 22, 0.7); color: #fff; font-size: 14px; font-weight: 600; outline: none; margin-bottom: 12px; box-sizing: border-box; }
+        .btn { width: 100%; padding: 14px; border-radius: 16px; border: none; background: var(--gradient-btn); color: #060913; font-weight: 800; cursor: pointer; text-transform: uppercase; margin-top: 8px; font-size: 14px; }
+        .btn-month { background: rgba(255, 255, 255, 0.08); border: 1px solid var(--card-border); color: #fff; margin-bottom: 10px; text-align: left; display: flex; justify-content: space-between; align-items: center; }
+        .btn-month:hover { background: rgba(0, 255, 136, 0.15); border-color: var(--primary); }
+        .screen-view { display: none; }
+        .screen-view.active { display: block; }
+        .ai-response { background: rgba(124, 77, 255, 0.08); border: 1px solid rgba(124, 77, 255, 0.25); border-radius: 16px; padding: 16px; font-size: 14px; line-height: 1.5; white-space: pre-line; color: #e2e8f0; }
+        .back-btn { background: rgba(255, 255, 255, 0.08); border: 1px solid var(--card-border); color: #fff; margin-top: 16px; }
+        .week-item { background: rgba(8, 12, 22, 0.5); padding: 12px 14px; border-radius: 12px; margin-bottom: 8px; border: 1px solid rgba(255,255,255,0.06); font-size: 14px; }
     </style>
 </head>
 <body>
 
 <div class="app-container">
-    <div class="card">
-        <h2>Настройка плана</h2>
-        <input type="number" id="age" placeholder="Возраст" value="25">
-        <input type="number" id="height" placeholder="Рост (см)" value="175">
-        <input type="number" id="weight" placeholder="Вес (кг)" value="70">
-        <button onclick="sendData()">Отправить данные</button>
-        <div id="aiOutput"></div>
+
+    <!-- ЭКРАН 1: ВЫБОР МЕСЯЦА (ГЛАВНАЯ) -->
+    <div id="screen-months" class="screen-view active">
+        <div class="card">
+            <h2>📅 Ваша программа тренировок</h2>
+            <p style="font-size: 13px; color: #94a3b8; margin-bottom: 16px;">Выберите месяц для просмотра расписания:</p>
+            
+            <button class="btn btn-month" onclick="openMonth('Месяц 1: Базовый адаптационный')">
+                <span>Месяц 1</span> <span>➡️</span>
+            </button>
+            <button class="btn btn-month" onclick="openMonth('Месяц 2: Увеличение нагрузки')">
+                <span>Месяц 2</span> <span>➡️</span>
+            </button>
+            <button class="btn btn-month" onclick="openMonth('Месяц 3: Интенсив и рельеф')">
+                <span>Месяц 3</span> <span>➡️</span>
+            </button>
+
+            <button class="btn" style="margin-top: 20px;" onclick="switchScreen('screen-profile')">⚙️ Настройки и ИИ-план</button>
+        </div>
+    </div>
+
+    <!-- ЭКРАН 2: НЕДЕЛЬНОЕ РАСПИСАНИЕ ВЫБРАННОГО МЕСЯЦА -->
+    <div id="screen-schedule" class="screen-view">
+        <div class="card">
+            <h2 id="monthTitle">Расписание</h2>
+            <div class="week-item"><b>Понедельник:</b> Верх тела (Грудь, плечи, трицепс)</div>
+            <div class="week-item"><b>Среда:</b> Низ тела (Ягодицы, квадрицепс)</div>
+            <div class="week-item"><b>Пятница:</b> Всё тело + Кор (Функциональный тренинг)</div>
+            
+            <button class="btn back-btn" onclick="switchScreen('screen-months')">⬅ Назад к месяцам</button>
+        </div>
+    </div>
+
+    <!-- ЭКРАН 3: НАСТРОЙКИ И АНАЛИЗ ИИ -->
+    <div id="screen-profile" class="screen-view">
+        <div class="card">
+            <h2>👤 Ваши параметры</h2>
+            
+            <label>Пол</label>
+            <select id="gender">
+                <option value="Мужчина">Мужчина</option>
+                <option value="Женщина">Женщина</option>
+            </select>
+
+            <label>Возраст</label>
+            <input type="number" id="age" value="25">
+
+            <label>Рост (см)</label>
+            <input type="number" id="height" value="175">
+
+            <label>Вес (кг)</label>
+            <input type="number" id="weight" value="70">
+
+            <label>Цель</label>
+            <select id="goal">
+                <option value="Постройнеть">Постройнеть / Сбросить вес</option>
+                <option value="Набрать мышечную массу">Набрать мышечную массу</option>
+            </select>
+
+            <label>Локация тренировок</label>
+            <select id="location">
+                <option value="Дома">Дома</option>
+                <option value="В зале">В зале</option>
+            </select>
+
+            <button class="btn" onclick="generateAIProgram()">⚡ Создать план от ИИ</button>
+            <button class="btn back-btn" onclick="switchScreen('screen-months')">⬅ Назад к программе</button>
+        </div>
+    </div>
+    
+    <!-- ЭКРАН 4: ВЫВОД ОТВЕТА ИИ -->
+    <div id="screen-ai" class="screen-view">
+        <div class="card">
+            <h2>🤖 План от Snap & Fit AI</h2>
+            <div class="ai-response" id="aiOutput">Генерируем программу...</div>
+            <button class="btn back-btn" onclick="switchScreen('screen-profile')">⬅ Назад к настройкам</button>
+        </div>
     </div>
 </div>
 
 <script>
-    // Точный и правильный адрес вашего бэкенда на Render
     const SERVER_URL = 'https://snap-fit-backend.onrender.com/api/analyze';
 
-    async function sendData() {
-        const out = document.getElementById('aiOutput');
-        const data = {
-            gender: 'Мужчина',
-            age: document.getElementById('age').value,
-            height: document.getElementById('height').value,
-            weight: document.getElementById('weight').value,
-            goal: 'Постройнеть',
-            location: 'Дома',
-            durationMonths: 3
-        };
+    function switchScreen(screenId) {
+        document.querySelectorAll('.screen-view').forEach(s => s.classList.remove('active'));
+        document.getElementById(screenId).classList.add('active');
+    }
 
-        out.innerText = "Отправляю запрос на сервер...";
+    function openMonth(monthName) {
+        document.getElementById('monthTitle').innerText = monthName;
+        switchScreen('screen-schedule');
+    }
+
+    async function generateAIProgram() {
+        const gender = document.getElementById('gender').value;
+        const age = document.getElementById('age').value;
+        const height = document.getElementById('height').value;
+        const weight = document.getElementById('weight').value;
+        const goal = document.getElementById('goal').value;
+        const location = document.getElementById('location').value;
+        
+        const out = document.getElementById('aiOutput');
+        
+        switchScreen('screen-ai');
+        out.innerText = "Искусственный интеллект анализирует ваши данные...";
 
         try {
             const response = await fetch(SERVER_URL, {
                 method: 'POST',
                 mode: 'cors',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data)
+                body: JSON.stringify({ gender, age, height, weight, goal, location, durationMonths: 3 })
             });
-
-            console.log("Status:", response.status);
 
             const json = await response.json();
 
             if (!response.ok) {
-                out.innerText = "Ошибка сервера: " + (json.error || response.status);
+                out.innerText = "❌ Ошибка сервера: " + (json.error || response.status);
             } else {
-                out.innerText = "Успех! Ответ от ИИ:\n\n" + json.text;
+                out.innerText = json.text;
             }
         } catch (e) {
-            out.innerText = "Ошибка сети: " + e.message;
+            out.innerText = "❌ Ошибка сети: не удалось связаться с сервером. " + e.message;
         }
     }
 </script>
