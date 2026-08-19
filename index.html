@@ -31,7 +31,25 @@
         
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         .header h1 { font-size: 24px; font-weight: 800; background: linear-gradient(135deg, #fff, var(--primary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin: 0; }
-        .btn-reload { background: rgba(255, 255, 255, 0.08); border: 1px solid var(--card-border); color: #fff; padding: 6px 12px; border-radius: 12px; font-size: 11px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 4px; }
+        
+        /* Увеличенная и удобная кнопка перезагрузки */
+        .btn-reload-big { 
+            background: rgba(255, 255, 255, 0.08); 
+            border: 1px solid var(--card-border); 
+            color: #fff; 
+            width: 100%;
+            padding: 14px; 
+            border-radius: 16px; 
+            font-size: 14px; 
+            font-weight: 700; 
+            cursor: pointer; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            gap: 8px; 
+            margin-top: 12px;
+            text-transform: uppercase;
+        }
         
         .card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 24px; padding: 20px; margin-bottom: 16px; backdrop-filter: blur(16px); }
         h2 { font-size: 17px; font-weight: 800; margin-top: 0; margin-bottom: 14px; color: #fff; }
@@ -85,7 +103,6 @@
 <div class="app-container">
     <div class="header">
         <h1>Snap & Fit AI</h1>
-        <button class="btn-reload" onclick="hardResetApp()">🔄 Перезагрузить</button>
     </div>
 
     <!-- 1. ПРОФИЛЬ -->
@@ -157,6 +174,9 @@
             </div>
 
             <button class="btn" onclick="generateAIProgram()">⚡ Рассчитать и создать план</button>
+            
+            <!-- Кнопка перезагрузки перенесена вниз и сделана крупнее -->
+            <button class="btn-reload-big" onclick="hardResetApp()">🔄 Перезагрузить приложение</button>
         </div>
     </div>
 
