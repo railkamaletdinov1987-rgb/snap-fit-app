@@ -70,7 +70,7 @@
         .ex-sets { font-size: 11px; color: var(--primary); font-weight: 800; }
         
         .demo-btn { background: rgba(0, 212, 255, 0.15); border: 1px solid rgba(0, 212, 255, 0.4); color: var(--accent); padding: 4px 8px; border-radius: 8px; font-size: 10px; font-weight: 700; cursor: pointer; margin-top: 6px; display: inline-block; }
-        .demo-gif { width: 100%; max-height: 200px; border-radius: 10px; margin-top: 8px; display: none; object-fit: cover; border: 1px solid rgba(255,255,255,0.1); }
+        .demo-gif { width: 100%; max-height: 220px; border-radius: 10px; margin-top: 8px; display: none; object-fit: cover; border: 1px solid rgba(255,255,255,0.1); }
 
         .ai-response { background: rgba(124, 77, 255, 0.08); border: 1px solid rgba(124, 77, 255, 0.25); border-radius: 16px; padding: 14px; font-size: 13px; line-height: 1.6; color: #e2e8f0; white-space: pre-line; }
         .loader { display: none; text-align: center; padding: 16px; color: var(--accent); font-size: 13px; font-weight: 700; }
@@ -216,13 +216,14 @@
     let aiAnalysisText = "";
     let swRegistration = null;
 
+    // Прямые проверенные анимации упражнений (без CORS/Giphy блокировок)
     const demoGifs = {
-        "Отжимания от пола/колен": "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExM3pueTRsdW5wY2o3NXpzc2NzcTF2eDRzeTlxbGFmdHFnd3Aza2ZneSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/k3LUpT1I93qms/giphy.gif",
-        "Приседания": "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExdWpydGthbTl5ZGlkMDFwbWRua21vZnUwcGF2NmkxaHZmdXkzcXNmciZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/131vvyL7S0aA2A/giphy.gif",
-        "Планка": "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNmprZDR3bjU1dWJzcTgxM2xocTBzcWlsNDVubmV5NDB3ZzhnaG04dyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/xT8qBff8cRRFf7k1I4/giphy.gif",
-        "Выпады назад": "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExaGcxMjcxNmNjcTRsNDh1bDYyc3AwdnVydm5lOWJqZHdtMjJxcHAwZCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/3o84sn09K3V3tmE0xy/giphy.gif",
-        "Жим штанги/гантелей лежа": "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNWVjcnhsdDFldGdtNDJzN3EzbHJ2bTl1eTJ3MnIzYnd2ZXRyN2hsbCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/l3V0wdf36FK23mS1W/giphy.gif",
-        "Приседания со штангой": "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExdWpydGthbTl5ZGlkMDFwbWRua21vZnUwcGF2NmkxaHZmdXkzcXNmciZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/131vvyL7S0aA2A/giphy.gif"
+        "Отжимания от пола/колен": "https://upload.wikimedia.org/wikipedia/commons/b/b8/Pushups.gif",
+        "Приседания": "https://upload.wikimedia.org/wikipedia/commons/8/82/Squats.gif",
+        "Планка": "https://upload.wikimedia.org/wikipedia/commons/c/ca/Plank_exercise.gif",
+        "Выпады назад": "https://upload.wikimedia.org/wikipedia/commons/d/d3/Bodyweight_lunges.gif",
+        "Жим штанги/гантелей лежа": "https://upload.wikimedia.org/wikipedia/commons/0/08/Bench-press-1.gif",
+        "Приседания со штангой": "https://upload.wikimedia.org/wikipedia/commons/1/18/Barbell-squat-animation.gif"
     };
 
     function switchScreen(screenId, btnElement) {
@@ -314,7 +315,7 @@
                 html += `<div class="day-title">${d.name}</div>`;
                 d.list.forEach(exName => {
                     globalExId++;
-                    const gifUrl = demoGifs[exName] || "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExM3pueTRsdW5wY2o3NXpzc2NzcTF2eDRzeTlxbGFmdHFnd3Aza2ZneSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/k3LUpT1I93qms/giphy.gif";
+                    const gifUrl = demoGifs[exName] || "https://upload.wikimedia.org/wikipedia/commons/b/b8/Pushups.gif";
                     
                     html += `<div class="exercise-item">
                         <div class="ex-header">
@@ -322,7 +323,7 @@
                             <span class="ex-sets">${setsCount} подх. × ${repsCount} повт.</span>
                         </div>
                         <div class="demo-btn" onclick="toggleDemo('gif-${globalExId}')">🎬 Техника выполнения</div>
-                        <img id="gif-${globalExId}" class="demo-gif" src="${gifUrl}" alt="${exName}" onerror="this.onerror=null; this.src='https://dummyimage.com/400x250/0b1120/00ff88.png&text=Анимация+загружается...';">
+                        <img id="gif-${globalExId}" class="demo-gif" src="${gifUrl}" alt="${exName}" loading="lazy">
                     </div>`;
                 });
             });
@@ -386,7 +387,7 @@
         }
     }
 
-    // Логика автоматического обнаружения обновлений и сброса кэша
+    // Логика автоматического обнаружения обновлений
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('pwabuilder-sw.js').then(reg => {
             swRegistration = reg;
@@ -410,7 +411,7 @@
         });
     }
 
-    // Принудительное обновление по кнопке
+    // Принудительный сброс кэша
     async function forceAppUpdate() {
         if ('caches' in window) {
             const cacheNames = await caches.keys();
