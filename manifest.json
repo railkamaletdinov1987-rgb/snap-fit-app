@@ -1,13 +1,24 @@
 {
-  "background_color": "#060913",
-  "dir": "ltr",
-  "display": "standalone",
-  "name": "Snap &amp; Fit",
-  "orientation": "any",
-  "scope": "/",
+  "name": "Snap & Fit AI",
   "short_name": "SnapFit",
-  "start_url": "/",
-  "theme_color": "#060913",
   "id": "com.snapfit.app",
-  "description": "Snap &amp; Fit - Персональный ИИ фитнес-тренер"
+  "description": "Snap & Fit - Персональный ИИ фитнес-тренер",
+  "start_url": "/snap-fit-app/",
+  "display": "standalone",
+  "background_color": "#060913",
+  "theme_color": "#060913",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/2964/2964514.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/2964/2964514.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
 }
