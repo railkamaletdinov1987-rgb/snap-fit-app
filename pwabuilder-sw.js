@@ -1,5 +1,5 @@
-// Cache version: v5.0
-const CACHE_NAME = 'snap-fit-cache-v5';
+// Cache version: v6.0
+const CACHE_NAME = 'snap-fit-cache-v6';
 
 self.addEventListener('install', (event) => {
   self.skipWaiting();
