@@ -71,8 +71,11 @@
         
         .demo-btn { background: rgba(0, 212, 255, 0.15); border: 1px solid rgba(0, 212, 255, 0.4); color: var(--accent); padding: 6px 10px; border-radius: 8px; font-size: 11px; font-weight: 700; cursor: pointer; margin-top: 8px; display: inline-block; }
         
-        .demo-container { display: none; margin-top: 10px; border-radius: 12px; overflow: hidden; border: 1px solid var(--card-border); background: #080c16; text-align: center; padding: 10px; }
-        .demo-img { width: 100%; max-height: 220px; object-fit: contain; border-radius: 8px; }
+        /* SVG Анимация */
+        .demo-container { display: none; margin-top: 10px; border-radius: 12px; overflow: hidden; border: 1px solid var(--card-border); background: #080c16; text-align: center; padding: 12px; }
+        .svg-anim { width: 100%; max-height: 160px; }
+        .anim-body { animation: exerciseMove 1.5s infinite ease-in-out alternate; transform-origin: center; }
+        @keyframes exerciseMove { 0% { transform: translateY(-8px) scaleY(0.96); } 100% { transform: translateY(8px) scaleY(1.04); } }
 
         .ai-response { background: rgba(124, 77, 255, 0.08); border: 1px solid rgba(124, 77, 255, 0.25); border-radius: 16px; padding: 14px; font-size: 13px; line-height: 1.6; color: #e2e8f0; white-space: pre-line; }
         .loader { display: none; text-align: center; padding: 16px; color: var(--accent); font-size: 13px; font-weight: 700; }
@@ -217,14 +220,14 @@
     let aiAnalysisText = "";
     let swRegistration = null;
 
-   const demoGifs = {
-    "Отжимания от пола/колен": "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExOHp1ZHkxeGVkNXJ5dGUyOW1mdnRyeDZ2MGJqMnJ3azAxeDByZXlsZyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/3o85xGocUH8RYoDKKs/giphy.gif",
-    "Приседания": "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExbnd2MXA5d3FzNzVsNXk2MHR0ejc2ZnQxeWVpdjRwMnRmdmR3OGRwYiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/l3q2Q3sUE95gBv0Si4/giphy.gif",
-    "Планка": "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExZjBzOWUxdXk0MmthOHByZnV3eWVrOWhxb2x1cjBnM2UzaGJzZWlqMCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/l2SpL94sNn99dFzY4/giphy.gif",
-    "Выпады назад": "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExbDVqamNrdG52cnp1NXZ0aXkzYWprOHpzaHFldXFiZXllOGc4ZjE1biZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/3o7TKR5XfI9141lGZa/giphy.gif",
-    "Жим штанги/гантелей лежа": "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExOHllZ2E1cnpmeGRsZmpyOWs3bmNjcHF5cXdpOXpndDRuMGFudXdwbyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/l3vRh0u9E5vK2QlyE/giphy.gif",
-    "Приседания со штангой": "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExbnd2MXA5d3FzNzVsNXk2MHR0ejc2ZnQxeWVpdjRwMnRmdmR3OGRwYiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/l3q2Q3sUE95gBv0Si4/giphy.gif"
-};
+    const svgDemos = {
+        "Отжимания от пола/колен": `<svg class="svg-anim" viewBox="0 0 200 120"><rect width="200" height="120" fill="#080c16" rx="8"/><line x1="20" y1="100" x2="180" y2="100" stroke="#00d4ff" stroke-width="4"/><g class="anim-body"><path d="M40 90 L90 70 L140 60 L160 85" stroke="#00ff88" stroke-width="6" stroke-linecap="round" fill="none"/><circle cx="165" cy="80" r="9" fill="#00ff88"/></g><text x="100" y="25" fill="#94a3b8" font-size="11" text-anchor="middle" font-weight="bold">ТЕХНИКА: ОТЖИМАНИЯ</text></svg>`,
+        "Приседания": `<svg class="svg-anim" viewBox="0 0 200 120"><rect width="200" height="120" fill="#080c16" rx="8"/><line x1="20" y1="110" x2="180" y2="110" stroke="#00d4ff" stroke-width="4"/><g class="anim-body"><path d="M100 110 L95 75 L105 45 L100 25" stroke="#00ff88" stroke-width="6" stroke-linecap="round" fill="none"/><circle cx="100" cy="18" r="9" fill="#00ff88"/></g><text x="100" y="20" fill="#94a3b8" font-size="11" text-anchor="middle" font-weight="bold">ТЕХНИКА: ПРИСЕДАНИЯ</text></svg>`,
+        "Планка": `<svg class="svg-anim" viewBox="0 0 200 120"><rect width="200" height="120" fill="#080c16" rx="8"/><line x1="20" y1="95" x2="180" y2="95" stroke="#00d4ff" stroke-width="4"/><path d="M40 85 L80 85 L140 82 L160 78" stroke="#00ff88" stroke-width="6" stroke-linecap="round" fill="none"/><circle cx="165" cy="72" r="9" fill="#00ff88"/><text x="100" y="25" fill="#94a3b8" font-size="11" text-anchor="middle" font-weight="bold">ТЕХНИКА: ПЛАНКА</text></svg>`,
+        "Выпады назад": `<svg class="svg-anim" viewBox="0 0 200 120"><rect width="200" height="120" fill="#080c16" rx="8"/><line x1="20" y1="110" x2="180" y2="110" stroke="#00d4ff" stroke-width="4"/><g class="anim-body"><path d="M70 110 L80 75 L100 50 L100 25" stroke="#00ff88" stroke-width="6" stroke-linecap="round" fill="none"/><path d="M100 75 L140 90 L140 110" stroke="#00ff88" stroke-width="5" stroke-linecap="round" fill="none"/><circle cx="100" cy="18" r="9" fill="#00ff88"/></g><text x="100" y="20" fill="#94a3b8" font-size="11" text-anchor="middle" font-weight="bold">ТЕХНИКА: ВЫПАДЫ</text></svg>`,
+        "Жим штанги/гантелей лежа": `<svg class="svg-anim" viewBox="0 0 200 120"><rect width="200" height="120" fill="#080c16" rx="8"/><rect x="50" y="75" width="100" height="10" fill="#00d4ff" rx="3"/><path d="M60 75 L100 75 L140 75" stroke="#00ff88" stroke-width="6"/><g class="anim-body"><line x1="70" y1="35" x2="130" y2="35" stroke="#fff" stroke-width="5"/><circle cx="70" cy="35" r="7" fill="#00ff88"/><circle cx="130" cy="35" r="7" fill="#00ff88"/></g><text x="100" y="20" fill="#94a3b8" font-size="11" text-anchor="middle" font-weight="bold">ТЕХНИКА: ЖИМ ЛЕЖА</text></svg>`,
+        "Приседания со штангой": `<svg class="svg-anim" viewBox="0 0 200 120"><rect width="200" height="120" fill="#080c16" rx="8"/><line x1="20" y1="110" x2="180" y2="110" stroke="#00d4ff" stroke-width="4"/><g class="anim-body"><path d="M100 110 L95 75 L105 45 L100 25" stroke="#00ff88" stroke-width="6" stroke-linecap="round" fill="none"/><line x1="70" y1="32" x2="130" y2="32" stroke="#fff" stroke-width="5"/><circle cx="100" cy="18" r="9" fill="#00ff88"/></g><text x="100" y="20" fill="#94a3b8" font-size="11" text-anchor="middle" font-weight="bold">ТЕХНИКА: ПРИСЕД СО ШТАНГОЙ</text></svg>`
+    };
 
     function switchScreen(screenId, btnElement) {
         document.querySelectorAll('.screen-view').forEach(s => s.classList.remove('active'));
@@ -256,16 +259,6 @@
         const box = document.getElementById(id);
         if (box) {
             box.style.display = (box.style.display === 'block') ? 'none' : 'block';
-        }
-    }
-
-    function handleImageError(imgElement, exName) {
-        imgElement.style.display = 'none';
-        const parent = imgElement.parentElement;
-        if (!parent.querySelector('.tech-fallback')) {
-            parent.innerHTML += `<div class="tech-fallback" style="padding:15px; background:rgba(0,255,136,0.05); border-radius:8px; color:var(--primary); font-size:12px; font-weight:700;">
-                🏋️ Техника: ${exName}<br><span style="color:var(--text-muted); font-size:11px; font-weight:400;">Спина прямая, плавный темп, контроль дыхания.</span>
-            </div>`;
         }
     }
 
@@ -331,7 +324,7 @@
                 html += `<div class="day-title">${d.name}</div>`;
                 d.list.forEach(exName => {
                     globalExId++;
-                    const imgUrl = demoGifs[exName] || "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?w=500&auto=format&fit=crop";
+                    const svgContent = svgDemos[exName] || svgDemos["Планка"];
                     
                     html += `<div class="exercise-item">
                         <div class="ex-header">
@@ -340,7 +333,7 @@
                         </div>
                         <div class="demo-btn" onclick="toggleDemo('demo-${globalExId}')">🎬 Техника выполнения</div>
                         <div id="demo-${globalExId}" class="demo-container">
-                            <img class="demo-img" src="${imgUrl}" alt="${exName}" referrerpolicy="no-referrer" onerror="handleImageError(this, '${exName}')">
+                            ${svgContent}
                         </div>
                     </div>`;
                 });
