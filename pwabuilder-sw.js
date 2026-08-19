@@ -9,9 +9,7 @@ self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((cacheNames) => {
       return Promise.all(
-        cacheNames.map((cache) => {
-          return caches.delete(cache); // Удаляем абсолютно все прошлые кэши
-        })
+        cacheNames.map((cache) => caches.delete(cache)) // Удаляем все старые кэши
       );
     }).then(() => self.clients.claim())
   );
@@ -24,11 +22,15 @@ self.addEventListener('message', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
-  if (event.request.url.includes('/api/analyze')) {
-    return;
+  // Игнорируем API-запросы и не-GET методы, отдавая их стандартному сетевому стеку браузера
+  if (event.request.url.includes('/api/') || event.request.method !== 'GET') {
+    return; // Не вызываем event.respondWith — браузер сам выполнит сетевой запрос
   }
-  // Заставляем браузер брать только свежую версию с сервера
+
+  // Для остальных статических ресурсов запрашиваем свежую версию с сервера
   event.respondWith(
-    fetch(event.request, { cache: 'no-store' }).catch(() => caches.match(event.request))
+    fetch(event.request, { cache: 'no-store' }).catch(() => {
+      return caches.match(event.request);
+    })
   );
 });
