@@ -1,7 +1,6 @@
-// Cache version: v2.0
-const CACHE_NAME = 'snap-fit-cache-v2';
+// Cache version: v3.0
+const CACHE_NAME = 'snap-fit-cache-v3';
 
-// 1. Установка и активация
 self.addEventListener('install', (event) => {
   self.skipWaiting();
 });
@@ -21,20 +20,27 @@ self.addEventListener('activate', (event) => {
   self.clients.claim();
 });
 
-// 2. Обработка команд от интерфейса (сообщение SKIP_WAITING)
 self.addEventListener('message', (event) => {
   if (event.data && event.data.type === 'SKIP_WAITING') {
     self.skipWaiting();
   }
 });
 
-// 3. Сетевые запросы
 self.addEventListener('fetch', (event) => {
-  // Не кэшируем запросы к нашему ИИ-серверу
+  // 1. Игнорируем запрос к ИИ-серверу
   if (event.request.url.includes('/api/analyze')) {
     return;
   }
-  
+
+  // 2. Для HTML и скриптов отключаем дисковый HTTP-кэш браузера (cache: 'reload')
+  if (event.request.mode === 'navigate' || event.request.destination === 'document') {
+    event.respondWith(
+      fetch(event.request, { cache: 'reload' }).catch(() => caches.match(event.request))
+    );
+    return;
+  }
+
+  // 3. Для остальных ресурсов
   event.respondWith(
     fetch(event.request).catch(() => caches.match(event.request))
   );
