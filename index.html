@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Snap & Fit AI</title>
     <meta name="theme-color" content="#060913">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -23,9 +23,9 @@
             --gradient-btn: linear-gradient(135deg, #00ff88 0%, #00d4ff 100%);
         }
 
-        * { box-sizing: border-box; transition: all 0.25s ease; }
+        * { box-sizing: border-box; transition: background 0.25s ease, border-color 0.25s ease, color 0.25s ease; }
         body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 0; display: flex; justify-content: center; min-height: 100vh; }
-        .app-container { width: 100%; max-width: 480px; padding: 20px 16px 95px 16px; }
+        .app-container { width: 100%; max-width: 480px; padding: 20px 16px 120px 16px; }
         
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         .header h1 { font-size: 24px; font-weight: 800; background: linear-gradient(135deg, #fff, var(--primary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin: 0; }
@@ -46,7 +46,7 @@
         
         .photo-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
         .photo-btn { border: 1px dashed rgba(0, 255, 136, 0.4); border-radius: 16px; padding: 14px 8px; text-align: center; background: rgba(0, 255, 136, 0.03); cursor: pointer; font-size: 12px; font-weight: 700; color: #fff; display: flex; flex-direction: column; align-items: center; gap: 6px; }
-        .preview-img { max-width: 100%; max-height: 180px; border-radius: 14px; margin-top: 8px; display: none; border: 1px solid var(--card-border); }
+        .preview-img { max-width: 100%; max-height: 180px; border-radius: 14px; margin-top: 8px; display: none; border: 1px solid var(--card-border); object-fit: cover; }
 
         .stat-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 12px; }
         .stat-card { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); padding: 12px; border-radius: 16px; text-align: center; }
@@ -56,7 +56,7 @@
         .screen-view { display: none; }
         .screen-view.active { display: block; }
         
-        .nav-bar { position: fixed; bottom: 12px; left: 50%; transform: translateX(-50%); width: calc(100% - 24px); max-width: 456px; background: var(--nav-bg); backdrop-filter: blur(20px); border: 1px solid var(--card-border); border-radius: 24px; display: flex; justify-content: space-around; padding: 8px 6px; z-index: 100; }
+        .nav-bar { position: fixed; bottom: calc(12px + env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%); width: calc(100% - 24px); max-width: 456px; background: var(--nav-bg); backdrop-filter: blur(20px); border: 1px solid var(--card-border); border-radius: 24px; display: flex; justify-content: space-around; padding: 8px 6px; z-index: 100; }
         .nav-item { background: none; border: none; color: var(--text-muted); display: flex; flex-direction: column; align-items: center; font-size: 11px; font-weight: 700; cursor: pointer; padding: 8px; width: 25%; border-radius: 16px; }
         .nav-item.active { color: #fff; background: rgba(255, 255, 255, 0.08); }
 
@@ -100,7 +100,7 @@
                 <div class="photo-btn" onclick="document.getElementById('cameraInput').click()"><span>📸</span> Сделать фото</div>
                 <div class="photo-btn" onclick="document.getElementById('galleryInput').click()"><span>📁</span> Из галереи</div>
             </div>
-            <input type="file" id="cameraInput" accept="image/*" capture="user" onchange="previewPhoto(event)" style="display:none">
+            <input type="file" id="cameraInput" accept="image/*" onchange="previewPhoto(event)" style="display:none">
             <input type="file" id="galleryInput" accept="image/*" onchange="previewPhoto(event)" style="display:none">
             <div style="text-align:center;"><img id="photoPreview" class="preview-img" alt="Превью фото"></div>
         </div>
@@ -117,18 +117,18 @@
                 </div>
                 <div>
                     <label for="age">Возраст</label>
-                    <input type="number" id="age" placeholder="25">
+                    <input type="number" id="age" placeholder="25" min="12" max="100">
                 </div>
             </div>
 
             <div class="grid-2">
                 <div>
                     <label for="height">Рост (см)</label>
-                    <input type="number" id="height" placeholder="175">
+                    <input type="number" id="height" placeholder="175" min="100" max="250">
                 </div>
                 <div>
                     <label for="weight">Вес (кг)</label>
-                    <input type="number" id="weight" placeholder="70">
+                    <input type="number" id="weight" placeholder="70" min="30" max="300">
                 </div>
             </div>
 
@@ -213,11 +213,10 @@
 
 <script>
     const SERVER_URL = 'https://snap-fit-backend.onrender.com/api/analyze';
-    let photoBase64 = null;
+    let selectedImageFile = null;
     let aiAnalysisText = "";
     let swRegistration = null;
 
-    // Публичные валидные медиафайлы с защитой от блокировки
     const demoGifs = {
         "Отжимания от пола/колен": "https://images.unsplash.com/photo-1598971639058-fab3c3109a00?w=500&auto=format&fit=crop",
         "Приседания": "https://images.unsplash.com/photo-1574680096145-d05b474e2155?w=500&auto=format&fit=crop",
@@ -237,15 +236,20 @@
     function previewPhoto(event) {
         const file = event.target.files[0];
         if (file) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                photoBase64 = e.target.result.split(',')[1];
-                const previewImg = document.getElementById('photoPreview');
-                previewImg.src = e.target.result;
-                previewImg.style.display = 'inline-block';
-            }
-            reader.readAsDataURL(file);
+            selectedImageFile = file;
+            const previewImg = document.getElementById('photoPreview');
+            previewImg.src = URL.createObjectURL(file);
+            previewImg.style.display = 'inline-block';
         }
+    }
+
+    function fileToBase64(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => resolve(reader.result.split(',')[1]);
+            reader.onerror = error => reject(error);
+        });
     }
 
     function toggleDemo(id) {
@@ -258,9 +262,11 @@
     function handleImageError(imgElement, exName) {
         imgElement.style.display = 'none';
         const parent = imgElement.parentElement;
-        parent.innerHTML += `<div style="padding:15px; background:rgba(0,255,136,0.05); border-radius:8px; color:var(--primary); font-size:12px; font-weight:700;">
-            🏋️ Техника: ${exName}<br><span style="color:var(--text-muted); font-size:11px; font-weight:400;">Спина прямая, плавный темп, контроль дыхания.</span>
-        </div>`;
+        if (!parent.querySelector('.tech-fallback')) {
+            parent.innerHTML += `<div class="tech-fallback" style="padding:15px; background:rgba(0,255,136,0.05); border-radius:8px; color:var(--primary); font-size:12px; font-weight:700;">
+                🏋️ Техника: ${exName}<br><span style="color:var(--text-muted); font-size:11px; font-weight:400;">Спина прямая, плавный темп, контроль дыхания.</span>
+            </div>`;
+        }
     }
 
     function calculatePersonalMetrics() {
@@ -278,7 +284,8 @@
 
         let prot = Math.round(weight * (goal === 'Набрать массу' ? 2.0 : 1.6));
         let fat = Math.round(weight * 0.9);
-        let carb = Math.round((targetCal - (prot * 4 + fat * 9)) / 4);
+        let carb = Math.max(20, Math.round((targetCal - (prot * 4 + fat * 9)) / 4));
+        
         let fatPercent = gender === 'Мужчина' 
             ? Math.round(1.20 * (weight / ((height/100)**2)) + 0.23 * age - 16.2)
             : Math.round(1.20 * (weight / ((height/100)**2)) + 0.23 * age - 5.4);
@@ -308,7 +315,7 @@
 
         for (let m = 1; m <= durationMonths; m++) {
             let setsCount = 3 + Math.floor((m - 1) / 2);
-            let repsCount = goal === 'Набрать массу' ? (12 - m) : (12 + m * 2);
+            let repsCount = goal === 'Набрать массу' ? Math.max(6, 12 - m) : (12 + m * 2);
             let intensity = m === 1 ? "Втягивающий этап" : (m <= 3 ? "Прогрессия нагрузки" : "Высокая интенсивность");
 
             html += `<div class="month-block">
@@ -348,7 +355,7 @@
     async function generateAIProgram() {
         const metrics = calculatePersonalMetrics();
         if (!metrics) {
-            alert("Заполните Возраст, Рост и Вес!");
+            alert("Пожалуйста, заполните Возраст, Рост и Вес!");
             return;
         }
 
@@ -368,6 +375,11 @@
         document.getElementById('loader').style.display = 'block';
 
         try {
+            let photoBase64 = null;
+            if (selectedImageFile) {
+                photoBase64 = await fileToBase64(selectedImageFile);
+            }
+
             const response = await fetch(SERVER_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -383,22 +395,25 @@
                 })
             });
 
+            if (!response.ok) {
+                throw new Error(`Ошибка сервера: ${response.status}`);
+            }
+
             const data = await response.json();
             if (data.success) {
                 aiAnalysisText = data.text;
                 document.getElementById('aiOutput').innerText = aiAnalysisText;
                 generateProgressiveProgram(goal, location, duration, aiAnalysisText);
             } else {
-                document.getElementById('aiOutput').innerText = "⚠️ Ошибка сервера: " + (data.error || "Неизвестный сбой");
+                document.getElementById('aiOutput').innerText = "⚠️ Ошибка обработки: " + (data.error || "Неизвестный сбой");
             }
         } catch (e) {
-            document.getElementById('aiOutput').innerText = "Ошибка соединения с облачным сервером. Попробуйте еще раз через минуту.";
+            document.getElementById('aiOutput').innerText = " Ошибка соединения с сервером (" + e.message + "). Попробуйте еще раз.";
         } finally {
             document.getElementById('loader').style.display = 'none';
         }
     }
 
-    // Регистрация Service Worker
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('pwabuilder-sw.js').then(reg => {
             swRegistration = reg;
@@ -411,7 +426,7 @@
                     }
                 });
             });
-        });
+        }).catch(err => console.log('SW fail:', err));
 
         let isRefreshing = false;
         navigator.serviceWorker.addEventListener('controllerchange', () => {
@@ -422,7 +437,6 @@
         });
     }
 
-    // Функция принудительного обновления
     async function forceAppUpdate() {
         if ('caches' in window) {
             const cacheNames = await caches.keys();
