@@ -18,16 +18,16 @@
 <div class="app-container">
     <div class="card">
         <h2>Настройка плана</h2>
-        <input type="number" id="age" placeholder="Возраст">
-        <input type="number" id="height" placeholder="Рост (см)">
-        <input type="number" id="weight" placeholder="Вес (кг)">
+        <input type="number" id="age" placeholder="Возраст" value="25">
+        <input type="number" id="height" placeholder="Рост (см)" value="175">
+        <input type="number" id="weight" placeholder="Вес (кг)" value="70">
         <button onclick="sendData()">Отправить данные</button>
         <div id="aiOutput"></div>
     </div>
 </div>
 
 <script>
-    // Тот самый адрес, который уже подтвердил работу через /test
+    // Точный и правильный адрес вашего бэкенда на Render
     const SERVER_URL = 'https://snap-fit-backend.onrender.com/api/analyze';
 
     async function sendData() {
@@ -42,7 +42,7 @@
             durationMonths: 3
         };
 
-        out.innerText = "Отправляю на " + SERVER_URL + "...";
+        out.innerText = "Отправляю запрос на сервер...";
 
         try {
             const response = await fetch(SERVER_URL, {
@@ -54,13 +54,12 @@
 
             console.log("Status:", response.status);
 
-            if (response.status === 404) {
-                out.innerText = "Ошибка 404: Сервер не нашел путь /api/analyze. Убедитесь, что код на GitHub обновлен.";
-            } else if (!response.ok) {
-                out.innerText = "Ошибка " + response.status;
+            const json = await response.json();
+
+            if (!response.ok) {
+                out.innerText = "Ошибка сервера: " + (json.error || response.status);
             } else {
-                const json = await response.json();
-                out.innerText = "Успех! " + JSON.stringify(json.text);
+                out.innerText = "Успех! Ответ от ИИ:\n\n" + json.text;
             }
         } catch (e) {
             out.innerText = "Ошибка сети: " + e.message;
