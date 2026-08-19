@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Snap & Fit AI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #060913;
+            --card-bg: rgba(18, 24, 40, 0.65);
+            --card-border: rgba(255, 255, 255, 0.12);
+            --primary: #00ff88;
+            --accent: #00d4ff;
+            --text: #f8fafc;
+            --text-muted: #94a3b8;
+            --nav-bg: rgba(10, 15, 29, 0.85);
+            --gradient-btn: linear-gradient(135deg, #00ff88 0%, #00d4ff 100%);
+        }
+
+        * { box-sizing: border-box; transition: all 0.25s ease; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 0; display: flex; justify-content: center; min-height: 100vh; }
+        .app-container { width: 100%; max-width: 480px; padding: 20px 16px 95px 16px; }
+        .header { text-align: center; margin-bottom: 20px; }
+        .header h1 { font-size: 24px; font-weight: 800; background: linear-gradient(135deg, #fff, var(--primary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin: 0; }
+        
+        .card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 24px; padding: 20px; margin-bottom: 16px; backdrop-filter: blur(16px); }
+        h2 { font-size: 17px; font-weight: 800; margin-top: 0; margin-bottom: 14px; color: #fff; }
+        label { display: block; font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px; }
+        input, select { width: 100%; padding: 12px 14px; border-radius: 14px; border: 1px solid rgba(255, 255, 255, 0.12); background: rgba(8, 12, 22, 0.7); color: #fff; font-size: 14px; font-weight: 600; outline: none; margin-bottom: 12px; }
+        
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        
+        .btn { width: 100%; padding: 14px; border-radius: 16px; border: none; background: var(--gradient-btn); color: #060913; font-weight: 800; font-size: 15px; cursor: pointer; text-transform: uppercase; margin-top: 8px; }
+        
+        .photo-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+        .photo-btn { border: 1px dashed rgba(0, 255, 136, 0.4); border-radius: 16px; padding: 14px 8px; text-align: center; background: rgba(0, 255, 136, 0.03); cursor: pointer; font-size: 12px; font-weight: 700; color: #fff; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+        .preview-img { max-width: 100%; max-height: 180px; border-radius: 14px; margin-top: 8px; display: none; border: 1px solid var(--card-border); }
+
+        .stat-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 12px; }
+        .stat-card { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); padding: 12px; border-radius: 16px; text-align: center; }
+        .stat-val { font-size: 20px; font-weight: 800; color: var(--primary); }
+        .stat-lbl { font-size: 10px; color: var(--text-muted); text-transform: uppercase; font-weight: 700; }
+
+        .screen-view { display: none; }
+        .screen-view.active { display: block; }
+        
+        .nav-bar { position: fixed; bottom: 12px; left: 50%; transform: translateX(-50%); width: calc(100% - 24px); max-width: 456px; background: var(--nav-bg); backdrop-filter: blur(20px); border: 1px solid var(--card-border); border-radius: 24px; display: flex; justify-content: space-around; padding: 8px 6px; z-index: 100; }
+        .nav-item { background: none; border: none; color: var(--text-muted); display: flex; flex-direction: column; align-items: center; font-size: 11px; font-weight: 700; cursor: pointer; padding: 8px; width: 25%; border-radius: 16px; }
+        .nav-item.active { color: #fff; background: rgba(255, 255, 255, 0.08); }
+
+        .month-block { background: rgba(255, 255, 255, 0.02); border: 1px solid var(--card-border); border-radius: 18px; padding: 14px; margin-bottom: 16px; }
+        .month-title { font-size: 15px; font-weight: 800; color: var(--accent); margin-bottom: 10px; display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 6px; }
+        .day-title { font-size: 13px; font-weight: 700; color: var(--primary); margin: 10px 0 6px 0; }
+        
+        .exercise-item { background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255,255,255,0.06); border-radius: 14px; padding: 12px; margin-bottom: 10px; }
+        .ex-header { display: flex; justify-content: space-between; align-items: center; }
+        .ex-title { font-weight: 700; font-size: 13px; color: #fff; }
+        .ex-sets { font-size: 11px; color: var(--primary); font-weight: 800; }
+        
+        .demo-btn { background: rgba(0, 212, 255, 0.15); border: 1px solid rgba(0, 212, 255, 0.4); color: var(--accent); padding: 4px 8px; border-radius: 8px; font-size: 10px; font-weight: 700; cursor: pointer; margin-top: 6px; display: inline-block; }
+        .demo-gif { width: 100%; max-height: 200px; border-radius: 10px; margin-top: 8px; display: none; object-fit: cover; border: 1px solid rgba(255,255,255,0.1); }
+
+        .ai-response { background: rgba(124, 77, 255, 0.08); border: 1px solid rgba(124, 77, 255, 0.25); border-radius: 16px; padding: 14px; font-size: 13px; line-height: 1.6; color: #e2e8f0; white-space: pre-line; }
+        .loader { display: none; text-align: center; padding: 16px; color: var(--accent); font-size: 13px; font-weight: 700; }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <div class="header">
+        <h1>Snap & Fit AI</h1>
+    </div>
+
+    <!-- 1. ПРОФИЛЬ -->
+    <div id="screen-profile" class="screen-view active">
+        <div class="card">
+            <h2>📸 Фото фигуры</h2>
+            <div class="photo-actions">
+                <div class="photo-btn" onclick="document.getElementById('cameraInput').click()"><span>📸</span> Сделать фото</div>
+                <div class="photo-btn" onclick="document.getElementById('galleryInput').click()"><span>📁</span> Из галереи</div>
+            </div>
+            <input type="file" id="cameraInput" accept="image/*" capture="user" onchange="previewPhoto(event)" style="display:none">
+            <input type="file" id="galleryInput" accept="image/*" onchange="previewPhoto(event)" style="display:none">
+            <div style="text-align:center;"><img id="photoPreview" class="preview-img"></div>
+        </div>
+
+        <div class="card">
+            <h2>👤 Ваши параметры</h2>
+            <div class="grid-2">
+                <div>
+                    <label>Пол</label>
+                    <select id="gender">
+                        <option value="Мужчина">Мужчина</option>
+                        <option value="Женщина">Женщина</option>
+                    </select>
+                </div>
+                <div>
+                    <label>Возраст</label>
+                    <input type="number" id="age" placeholder="25">
+                </div>
+            </div>
+
+            <div class="grid-2">
+                <div>
+                    <label>Рост (см)</label>
+                    <input type="number" id="height" placeholder="175">
+                </div>
+                <div>
+                    <label>Вес (кг)</label>
+                    <input type="number" id="weight" placeholder="70">
+                </div>
+            </div>
+
+            <div class="grid-2">
+                <div>
+                    <label>Цель</label>
+                    <select id="goal">
+                        <option value="Постройнеть">Постройнеть</option>
+                        <option value="Набрать массу">Набрать массу</option>
+                        <option value="Рельеф">Рельеф</option>
+                    </select>
+                </div>
+                <div>
+                    <label>Локация</label>
+                    <select id="location">
+                        <option value="Дома">Дома</option>
+                        <option value="Зал">В зале</option>
+                    </select>
+                </div>
+            </div>
+
+            <div>
+                <label>Срок программы</label>
+                <select id="duration">
+                    <option value="1">1 Месяц</option>
+                    <option value="2">2 Месяца</option>
+                    <option value="3" selected>3 Месяца</option>
+                    <option value="6">6 Месяцев</option>
+                </select>
+            </div>
+
+            <button class="btn" onclick="generateAIProgram()">⚡ Рассчитать и создать план</button>
+        </div>
+    </div>
+
+    <!-- 2. РАСЧЕТЫ -->
+    <div id="screen-stats" class="screen-view">
+        <div class="card">
+            <h2>📊 Расчет КБЖУ</h2>
+            <div class="stat-grid">
+                <div class="stat-card">
+                    <div class="stat-val" id="calcCalories">0</div>
+                    <div class="stat-lbl">ккал / день</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-val" id="calcFatPercent">0%</div>
+                    <div class="stat-lbl">Процент жира</div>
+                </div>
+            </div>
+            <div class="grid-3">
+                <div class="stat-card"><div class="stat-val" id="calcProt">0г</div><div class="stat-lbl">Белки</div></div>
+                <div class="stat-card"><div class="stat-val" id="calcFat">0г</div><div class="stat-lbl">Жиры</div></div>
+                <div class="stat-card"><div class="stat-val" id="calcCarb">0г</div><div class="stat-lbl">Углеводы</div></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. ТРЕНИРОВКИ -->
+    <div id="screen-workout" class="screen-view">
+        <div class="card">
+            <h2>📅 План с Анимациями (3 раза в неделю)</h2>
+            <div id="workoutProgramList">Заполните данные во вкладке "Профиль"</div>
+        </div>
+    </div>
+
+    <!-- 4. ИИ И АНАЛИТИКА -->
+    <div id="screen-ai" class="screen-view">
+        <div class="card">
+            <h2>🤖 Анализ фигуры от Gemini ИИ</h2>
+            <div class="loader" id="loader">⏳ ИИ анализирует данные и фото...</div>
+            <div class="ai-response" id="aiOutput">Сначала укажите параметры и нажмите "Рассчитать и создать план".</div>
+        </div>
+    </div>
+</div>
+
+<div class="nav-bar">
+    <button class="nav-item active" onclick="switchScreen('profile', this)">👤 Профиль</button>
+    <button class="nav-item" onclick="switchScreen('stats', this)">📊 Расчеты</button>
+    <button class="nav-item" onclick="switchScreen('workout', this)">💪 План</button>
+    <button class="nav-item" onclick="switchScreen('ai', this)">🤖 ИИ Анализ</button>
+</div>
+
+<script>
+    // Публичный адрес вашего сервера на Render
+    const SERVER_URL = 'https://snap-fit-backend.onrender.com/api/analyze';
+    let photoBase64 = null;
+
+    const demoGifs = {
+        "Отжимания от пола/колен": "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExMjRrenplZWJzNzIxbHRvZGVyMXdmbWFvbmMxeHhhOXQyc3V1NWdrZCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/3o7TKRnoP3f7k53qA0/giphy.gif",
+        "Приседания": "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNWwzc3FtbHBneGg5NHJzcThmYzQyNDM4cHRsaGgwbjNlYnRqN3Q3OCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/xT0xezQGU5xCDJuCpq/giphy.gif",
+        "Планка": "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExd2R4bTN3cHMwNTc0cnptdWh6NnhxODgxeDFvYW0wZjlrc3dldWh6cCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/l0HlSno4t81LInY6Q/giphy.gif",
+        "Выпады назад": "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExYzJocTJ1ejI4bXdyczF1czM1bzZscHBwdGV3ZmhqdnhsbWlna3Q0YyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/l3vR1v8LInS7yQ3le/giphy.gif",
+        "Жим штанги/гантелей лежа": "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExdnh4OHplamQ5YWFwMXY2bndpYmt6MGdwaHRvOGEyb3Fud2hxejlpaSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/3o7TKL33Y02h5r5k1G/giphy.gif",
+        "Приседания со штангой": "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNWwzc3FtbHBneGg5NHJzcThmYzQyNDM4cHRsaGgwbjNlYnRqN3Q3OCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/xT0xezQGU5xCDJuCpq/giphy.gif"
+    };
+
+    function switchScreen(screenId, btnElement) {
+        document.querySelectorAll('.screen-view').forEach(s => s.classList.remove('active'));
+        document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+        document.getElementById(`screen-${screenId}`).classList.add('active');
+        btnElement.classList.add('active');
+    }
+
+    function previewPhoto(event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                photoBase64 = e.target.result.split(',')[1];
+                const previewImg = document.getElementById('photoPreview');
+                previewImg.src = e.target.result;
+                previewImg.style.display = 'inline-block';
+            }
+            reader.readAsDataURL(file);
+        }
+    }
+
+    function toggleDemo(id) {
+        const img = document.getElementById(id);
+        if (img) {
+            img.style.display = img.style.display === 'block' ? 'none' : 'block';
+        }
+    }
+
+    function calculatePersonalMetrics() {
+        const weight = parseFloat(document.getElementById('weight').value);
+        const height = parseFloat(document.getElementById('height').value);
+        const age = parseFloat(document.getElementById('age').value);
+        const gender = document.getElementById('gender').value;
+        const goal = document.getElementById('goal').value;
+
+        if (!weight || !height || !age) return null;
+
+        let bmr = (10 * weight) + (6.25 * height) - (5 * age) + (gender === 'Мужчина' ? 5 : -161);
+        let tdee = Math.round(bmr * 1.375);
+        let targetCal = goal === 'Постройнеть' ? tdee - 400 : (goal === 'Набрать массу' ? tdee + 400 : tdee);
+
+        let prot = Math.round(weight * (goal === 'Набрать массу' ? 2.0 : 1.6));
+        let fat = Math.round(weight * 0.9);
+        let carb = Math.round((targetCal - (prot * 4 + fat * 9)) / 4);
+        let fatPercent = gender === 'Мужчина' 
+            ? Math.round(1.20 * (weight / ((height/100)**2)) + 0.23 * age - 16.2)
+            : Math.round(1.20 * (weight / ((height/100)**2)) + 0.23 * age - 5.4);
+
+        return { targetCal, prot, fat, carb, fatPercent: Math.max(5, fatPercent) };
+    }
+
+    function generateProgressiveProgram(goal, location, durationMonths) {
+        let html = '';
+        const homeEx = {
+            day1: ["Отжимания от пола/колен", "Приседания", "Планка"],
+            day2: ["Выпады назад", "Приседания", "Планка"],
+            day3: ["Отжимания от пола/колен", "Выпады назад", "Планка"]
+        };
+        const gymEx = {
+            day1: ["Жим штанги/гантелей лежа", "Приседания со штангой", "Планка"],
+            day2: ["Приседания со штангой", "Жим штанги/гантелей лежа", "Планка"],
+            day3: ["Жим штанги/гантелей лежа", "Приседания со штангой", "Планка"]
+        };
+
+        const baseEx = location === 'Дома' ? homeEx : gymEx;
+        let globalExId = 0;
+
+        for (let m = 1; m <= durationMonths; m++) {
+            let setsCount = 3 + Math.floor((m - 1) / 2);
+            let repsCount = goal === 'Набрать массу' ? (12 - m) : (12 + m * 2);
+            let intensity = m === 1 ? "Втягивающий этап" : (m <= 3 ? "Прогрессия нагрузки" : "Высокая интенсивность");
+
+            html += `<div class="month-block">
+                <div class="month-title"><span>Месяц ${m}</span><span style="font-size:11px; font-weight:600; color:var(--text-muted);">${intensity}</span></div>`;
+
+            const days = [
+                { name: "Понедельник", list: baseEx.day1 },
+                { name: "Среда", list: baseEx.day2 },
+                { name: "Пятница", list: baseEx.day3 }
+            ];
+
+            days.forEach(d => {
+                html += `<div class="day-title">${d.name}</div>`;
+                d.list.forEach(exName => {
+                    globalExId++;
+                    const gifUrl = demoGifs[exName] || "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExMjRrenplZWJzNzIxbHRvZGVyMXdmbWFvbmMxeHhhOXQyc3V1NWdrZCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/3o7TKRnoP3f7k53qA0/giphy.gif";
+                    
+                    html += `<div class="exercise-item">
+                        <div class="ex-header">
+                            <span class="ex-title">${exName}</span>
+                            <span class="ex-sets">${setsCount} подх. × ${repsCount} повт.</span>
+                        </div>
+                        <div class="demo-btn" onclick="toggleDemo('gif-${globalExId}')">🎬 Техника выполнения</div>
+                        <img id="gif-${globalExId}" class="demo-gif" src="${gifUrl}" alt="${exName}">
+                    </div>`;
+                });
+            });
+
+            html += `</div>`;
+        }
+
+        document.getElementById('workoutProgramList').innerHTML = html;
+    }
+
+    async function generateAIProgram() {
+        const metrics = calculatePersonalMetrics();
+        if (!metrics) {
+            alert("Заполните Возраст, Рост и Вес!");
+            return;
+        }
+
+        document.getElementById('calcCalories').innerText = metrics.targetCal;
+        document.getElementById('calcFatPercent').innerText = metrics.fatPercent + '%';
+        document.getElementById('calcProt').innerText = metrics.prot + 'г';
+        document.getElementById('calcFat').innerText = metrics.fat + 'г';
+        document.getElementById('calcCarb').innerText = metrics.carb + 'г';
+
+        const goal = document.getElementById('goal').value;
+        const location = document.getElementById('location').value;
+        const duration = parseInt(document.getElementById('duration').value);
+
+        generateProgressiveProgram(goal, location, duration);
+
+        switchScreen('ai', document.querySelectorAll('.nav-item')[3]);
+        document.getElementById('loader').style.display = 'block';
+
+        try {
+            const response = await fetch(SERVER_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    gender: document.getElementById('gender').value,
+                    age: document.getElementById('age').value,
+                    height: document.getElementById('height').value,
+                    weight: document.getElementById('weight').value,
+                    goal: goal,
+                    location: location,
+                    durationMonths: duration,
+                    photoBase64: photoBase64
+                })
+            });
+
+            const data = await response.json();
+            if (data.success) {
+                document.getElementById('aiOutput').innerText = data.text;
+            } else {
+                document.getElementById('aiOutput').innerText = "⚠️ Ошибка сервера: " + (data.error || "Неизвестный сбой");
+            }
+        } catch (e) {
+            document.getElementById('aiOutput').innerText = "Ошибка соединения с облачным сервером. Попробуйте еще раз через минуту.";
+        } finally {
+            document.getElementById('loader').style.display = 'none';
+        }
+    }
+</script>
+</body>
+</html>
