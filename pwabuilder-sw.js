@@ -1,5 +1,5 @@
-// Cache version: v6.0
-const CACHE_NAME = 'snap-fit-cache-v6';
+// Cache version: v7.0
+const CACHE_NAME = 'snap-fit-cache-v7';
 
 self.addEventListener('install', (event) => {
   self.skipWaiting();
@@ -17,7 +17,7 @@ self.addEventListener('activate', (event) => {
       );
     })
   );
-  self.clients.claim();
+  return self.clients.claim();
 });
 
 self.addEventListener('message', (event) => {
@@ -32,7 +32,7 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // 2. Для HTML и скриптов отключаем дисковый HTTP-кэш браузера (cache: 'reload')
+  // 2. Для HTML и навигационных запросов отключаем дисковый HTTP-кэш браузера (cache: 'reload')
   if (event.request.mode === 'navigate' || event.request.destination === 'document') {
     event.respondWith(
       fetch(event.request, { cache: 'reload' }).catch(() => caches.match(event.request))
