@@ -51,7 +51,7 @@
         .screen-view { display: none; }
         .screen-view.active { display: block; }
         
-        .nav-bar { position: fixed; bottom: 12px; left: 50%; transform: translateX(-50%); width: calc(100% - 24px); max-width: 456px; background: var(--nav-bg); backdrop-filter: blur(20px); border: 1px solid var(--card-border); border-radius: 24px; display: flex; justify-content: space-around; padding: 8px 6px; z-index: 100; }
+        .nav-bar { position: fixed; bottom: 12px; left: 50%; transform: translateX(-50%); width: calc(100% - 24px); max-width: 456px; background: var(--nav-bg); backdrop-filter: blur(20px); border: 1px solid var(--card-border); border-radius: 24px; display: flex; justify-style: space-around; padding: 8px 6px; z-index: 100; }
         .nav-item { background: none; border: none; color: var(--text-muted); display: flex; flex-direction: column; align-items: center; font-size: 11px; font-weight: 700; cursor: pointer; padding: 8px; width: 25%; border-radius: 16px; }
         .nav-item.active { color: #fff; background: rgba(255, 255, 255, 0.08); }
 
@@ -89,39 +89,39 @@
             </div>
             <input type="file" id="cameraInput" accept="image/*" capture="user" onchange="previewPhoto(event)" style="display:none">
             <input type="file" id="galleryInput" accept="image/*" onchange="previewPhoto(event)" style="display:none">
-            <div style="text-align:center;"><img id="photoPreview" class="preview-img"></div>
+            <div style="text-align:center;"><img id="photoPreview" class="preview-img" alt="Превью фото"></div>
         </div>
 
         <div class="card">
             <h2>👤 Ваши параметры</h2>
             <div class="grid-2">
                 <div>
-                    <label>Пол</label>
+                    <label for="gender">Пол</label>
                     <select id="gender">
                         <option value="Мужчина">Мужчина</option>
                         <option value="Женщина">Женщина</option>
                     </select>
                 </div>
                 <div>
-                    <label>Возраст</label>
+                    <label for="age">Возраст</label>
                     <input type="number" id="age" placeholder="25">
                 </div>
             </div>
 
             <div class="grid-2">
                 <div>
-                    <label>Рост (см)</label>
+                    <label for="height">Рост (см)</label>
                     <input type="number" id="height" placeholder="175">
                 </div>
                 <div>
-                    <label>Вес (кг)</label>
+                    <label for="weight">Вес (кг)</label>
                     <input type="number" id="weight" placeholder="70">
                 </div>
             </div>
 
             <div class="grid-2">
                 <div>
-                    <label>Цель</label>
+                    <label for="goal">Цель</label>
                     <select id="goal">
                         <option value="Постройнеть">Постройнеть</option>
                         <option value="Набрать массу">Набрать массу</option>
@@ -129,7 +129,7 @@
                     </select>
                 </div>
                 <div>
-                    <label>Локация</label>
+                    <label for="location">Локация</label>
                     <select id="location">
                         <option value="Дома">Дома</option>
                         <option value="Зал">В зале</option>
@@ -138,7 +138,7 @@
             </div>
 
             <div>
-                <label>Срок программы</label>
+                <label for="duration">Срок программы</label>
                 <select id="duration">
                     <option value="1">1 Месяц</option>
                     <option value="2">2 Месяца</option>
@@ -203,7 +203,6 @@
     let photoBase64 = null;
     let aiAnalysisText = "";
 
-    // Используем стабильные прямые ссылки на анимации (Wikimedia & Wikimedia Commons)
     const demoGifs = {
         "Отжимания от пола/колен": "https://upload.wikimedia.org/wikipedia/commons/b/b8/Pushups.gif",
         "Приседания": "https://upload.wikimedia.org/wikipedia/commons/8/82/Squats.gif",
@@ -338,7 +337,6 @@
         const location = document.getElementById('location').value;
         const duration = parseInt(document.getElementById('duration').value);
 
-        // Вначале создаем базовый план
         generateProgressiveProgram(goal, location, duration);
 
         switchScreen('ai', document.querySelectorAll('.nav-item')[3]);
@@ -364,8 +362,6 @@
             if (data.success) {
                 aiAnalysisText = data.text;
                 document.getElementById('aiOutput').innerText = aiAnalysisText;
-                
-                // Перегенерируем план с учетом ИИ-анализа
                 generateProgressiveProgram(goal, location, duration, aiAnalysisText);
             } else {
                 document.getElementById('aiOutput').innerText = "⚠️ Ошибка сервера: " + (data.error || "Неизвестный сбой");
@@ -376,11 +372,10 @@
             document.getElementById('loader').style.display = 'none';
         }
     }
-</script>
-<script>
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('pwabuilder-sw.js');
-  }
+
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('pwabuilder-sw.js');
+    }
 </script>
 </body>
 </html>
