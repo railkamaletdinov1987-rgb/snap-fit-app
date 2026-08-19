@@ -2,98 +2,69 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <meta http-equiv="Pragma" content="no-cache">
-    <meta http-equiv="Expires" content="0">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Snap & Fit AI</title>
     <style>
-        :root { --bg: #060913; --card-bg: rgba(18, 24, 40, 0.65); --card-border: rgba(255, 255, 255, 0.12); --primary: #00ff88; --accent: #00d4ff; --text: #f8fafc; --gradient-btn: linear-gradient(135deg, #00ff88 0%, #00d4ff 100%); }
-        body { font-family: sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 0; display: flex; justify-content: center; min-height: 100vh; }
-        .app-container { width: 100%; max-width: 480px; padding: 20px 16px 120px 16px; }
-        .card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 24px; padding: 20px; margin-bottom: 16px; }
-        h2 { font-size: 17px; font-weight: 800; margin-top: 0; margin-bottom: 14px; color: #fff; }
-        label { display: block; font-size: 11px; font-weight: 700; text-transform: uppercase; color: #94a3b8; margin-bottom: 6px; }
-        input, select { width: 100%; padding: 12px 14px; border-radius: 14px; border: 1px solid rgba(255, 255, 255, 0.12); background: rgba(8, 12, 22, 0.7); color: #fff; font-size: 14px; font-weight: 600; outline: none; margin-bottom: 12px; }
-        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        .btn { width: 100%; padding: 14px; border-radius: 16px; border: none; background: var(--gradient-btn); color: #060913; font-weight: 800; cursor: pointer; text-transform: uppercase; margin-top: 8px; }
-        .btn-reload-big { background: rgba(255, 255, 255, 0.08); border: 1px solid var(--card-border); color: #fff; width: 100%; padding: 14px; border-radius: 16px; font-weight: 700; cursor: pointer; margin-top: 12px; text-transform: uppercase; }
-        .screen-view { display: none; }
-        .screen-view.active { display: block; }
-        .ai-response { background: rgba(124, 77, 255, 0.08); border: 1px solid rgba(124, 77, 255, 0.25); border-radius: 16px; padding: 14px; font-size: 13px; white-space: pre-line; }
+        body { font-family: sans-serif; background: #060913; color: #fff; display: flex; justify-content: center; padding: 20px; }
+        .app-container { width: 100%; max-width: 450px; }
+        .card { background: #121828; padding: 20px; border-radius: 20px; border: 1px solid #333; }
+        input, select { width: 100%; padding: 12px; margin: 8px 0; border-radius: 10px; background: #080c16; color: #fff; border: 1px solid #444; }
+        button { width: 100%; padding: 14px; margin-top: 10px; border-radius: 14px; border: none; background: linear-gradient(135deg, #00ff88, #00d4ff); font-weight: bold; cursor: pointer; }
+        #aiOutput { margin-top: 20px; white-space: pre-wrap; font-size: 13px; color: #ccc; }
     </style>
 </head>
 <body>
 
 <div class="app-container">
-    <div id="screen-profile" class="screen-view active">
-        <div class="card">
-            <h2>👤 Ваши параметры</h2>
-            <select id="gender"><option>Мужчина</option><option>Женщина</option></select>
-            <input type="number" id="age" placeholder="Возраст (12-100)">
-            <input type="number" id="height" placeholder="Рост (см)">
-            <input type="number" id="weight" placeholder="Вес (кг)">
-            <button class="btn" onclick="generateAIProgram()">⚡ Рассчитать и создать план</button>
-            <button class="btn-reload-big" onclick="hardResetApp()">🔄 Перезагрузить приложение</button>
-        </div>
-    </div>
-    
-    <div id="screen-ai" class="screen-view">
-        <div class="card">
-            <h2>🤖 Анализ</h2>
-            <div class="ai-response" id="aiOutput">Ожидание...</div>
-        </div>
+    <div class="card">
+        <h2>Настройка плана</h2>
+        <input type="number" id="age" placeholder="Возраст">
+        <input type="number" id="height" placeholder="Рост (см)">
+        <input type="number" id="weight" placeholder="Вес (кг)">
+        <button onclick="sendData()">Отправить данные</button>
+        <div id="aiOutput"></div>
     </div>
 </div>
 
 <script>
-    // АДРЕС СЕРВЕРА
+    // Тот самый адрес, который уже подтвердил работу через /test
     const SERVER_URL = 'https://snap-fit-backend.onrender.com/api/analyze';
 
-    async function generateAIProgram() {
-        const weight = document.getElementById('weight').value;
-        const height = document.getElementById('height').value;
-        const age = document.getElementById('age').value;
+    async function sendData() {
         const out = document.getElementById('aiOutput');
-        
-        if (!weight || !height || !age) {
-            alert("Заполните все поля!");
-            return;
-        }
+        const data = {
+            gender: 'Мужчина',
+            age: document.getElementById('age').value,
+            height: document.getElementById('height').value,
+            weight: document.getElementById('weight').value,
+            goal: 'Постройнеть',
+            location: 'Дома',
+            durationMonths: 3
+        };
 
-        out.innerText = "Отправка запроса на " + SERVER_URL + "...";
-        
+        out.innerText = "Отправляю на " + SERVER_URL + "...";
+
         try {
             const response = await fetch(SERVER_URL, {
                 method: 'POST',
+                mode: 'cors',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ gender: 'Мужчина', age, height, weight, goal: 'Постройнеть', location: 'Дома', durationMonths: 3 })
+                body: JSON.stringify(data)
             });
 
             console.log("Status:", response.status);
-            
-            if (!response.ok) {
-                const text = await response.text();
-                throw new Error("Ошибка " + response.status + ": " + text);
+
+            if (response.status === 404) {
+                out.innerText = "Ошибка 404: Сервер не нашел путь /api/analyze. Убедитесь, что код на GitHub обновлен.";
+            } else if (!response.ok) {
+                out.innerText = "Ошибка " + response.status;
+            } else {
+                const json = await response.json();
+                out.innerText = "Успех! " + JSON.stringify(json.text);
             }
-
-            const data = await response.json();
-            out.innerText = JSON.stringify(data, null, 2);
         } catch (e) {
-            console.error(e);
-            out.innerText = "КРИТИЧЕСКАЯ ОШИБКА: " + e.message + "\n\nПроверьте консоль браузера (F12)";
+            out.innerText = "Ошибка сети: " + e.message;
         }
-        
-        document.querySelectorAll('.screen-view').forEach(s => s.classList.remove('active'));
-        document.getElementById('screen-ai').classList.add('active');
-    }
-
-    async function hardResetApp() {
-        if ('caches' in window) {
-            const cacheNames = await caches.keys();
-            await Promise.all(cacheNames.map(name => caches.delete(name)));
-        }
-        window.location.reload(true);
     }
 </script>
 </body>
