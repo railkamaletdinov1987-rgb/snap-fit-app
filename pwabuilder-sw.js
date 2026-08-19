@@ -1,5 +1,5 @@
-// Cache version: v7.0
-const CACHE_NAME = 'snap-fit-cache-v7';
+// Cache version: v8.0 - Force Reset
+const CACHE_NAME = 'snap-fit-cache-v8';
 
 self.addEventListener('install', (event) => {
   self.skipWaiting();
@@ -10,14 +10,11 @@ self.addEventListener('activate', (event) => {
     caches.keys().then((cacheNames) => {
       return Promise.all(
         cacheNames.map((cache) => {
-          if (cache !== CACHE_NAME) {
-            return caches.delete(cache);
-          }
+          return caches.delete(cache); // Удаляем абсолютно все прошлые кэши
         })
       );
-    })
+    }).then(() => self.clients.claim())
   );
-  return self.clients.claim();
 });
 
 self.addEventListener('message', (event) => {
@@ -27,21 +24,11 @@ self.addEventListener('message', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
-  // 1. Игнорируем запрос к ИИ-серверу
   if (event.request.url.includes('/api/analyze')) {
     return;
   }
-
-  // 2. Для HTML и навигационных запросов отключаем дисковый HTTP-кэш браузера (cache: 'reload')
-  if (event.request.mode === 'navigate' || event.request.destination === 'document') {
-    event.respondWith(
-      fetch(event.request, { cache: 'reload' }).catch(() => caches.match(event.request))
-    );
-    return;
-  }
-
-  // 3. Для остальных ресурсов
+  // Заставляем браузер брать только свежую версию с сервера
   event.respondWith(
-    fetch(event.request).catch(() => caches.match(event.request))
+    fetch(event.request, { cache: 'no-store' }).catch(() => caches.match(event.request))
   );
 });
