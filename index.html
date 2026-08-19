@@ -51,7 +51,7 @@
         .screen-view { display: none; }
         .screen-view.active { display: block; }
         
-        .nav-bar { position: fixed; bottom: 12px; left: 50%; transform: translateX(-50%); width: calc(100% - 24px); max-width: 456px; background: var(--nav-bg); backdrop-filter: blur(20px); border: 1px solid var(--card-border); border-radius: 24px; display: flex; justify-style: space-around; padding: 8px 6px; z-index: 100; }
+        .nav-bar { position: fixed; bottom: 12px; left: 50%; transform: translateX(-50%); width: calc(100% - 24px); max-width: 456px; background: var(--nav-bg); backdrop-filter: blur(20px); border: 1px solid var(--card-border); border-radius: 24px; display: flex; justify-content: space-around; padding: 8px 6px; z-index: 100; }
         .nav-item { background: none; border: none; color: var(--text-muted); display: flex; flex-direction: column; align-items: center; font-size: 11px; font-weight: 700; cursor: pointer; padding: 8px; width: 25%; border-radius: 16px; }
         .nav-item.active { color: #fff; background: rgba(255, 255, 255, 0.08); }
 
@@ -203,13 +203,14 @@
     let photoBase64 = null;
     let aiAnalysisText = "";
 
+    // Прямые публичные ссылки на GIF с надежными CDN
     const demoGifs = {
-        "Отжимания от пола/колен": "https://upload.wikimedia.org/wikipedia/commons/b/b8/Pushups.gif",
-        "Приседания": "https://upload.wikimedia.org/wikipedia/commons/8/82/Squats.gif",
-        "Планка": "https://upload.wikimedia.org/wikipedia/commons/1/18/Plank_exercise.gif",
-        "Выпады назад": "https://upload.wikimedia.org/wikipedia/commons/a/a2/Lunges.gif",
-        "Жим штанги/гантелей лежа": "https://upload.wikimedia.org/wikipedia/commons/7/78/Bench-press-1.gif",
-        "Приседания со штангой": "https://upload.wikimedia.org/wikipedia/commons/8/82/Squats.gif"
+        "Отжимания от пола/колен": "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExM3pueTRsdW5wY2o3NXpzc2NzcTF2eDRzeTlxbGFmdHFnd3Aza2ZneSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/k3LUpT1I93qms/giphy.gif",
+        "Приседания": "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExdWpydGthbTl5ZGlkMDFwbWRua21vZnUwcGF2NmkxaHZmdXkzcXNmciZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/131vvyL7S0aA2A/giphy.gif",
+        "Планка": "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNmprZDR3bjU1dWJzcTgxM2xocTBzcWlsNDVubmV5NDB3ZzhnaG04dyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/xT8qBff8cRRFf7k1I4/giphy.gif",
+        "Выпады назад": "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExaGcxMjcxNmNjcTRsNDh1bDYyc3AwdnVydm5lOWJqZHdtMjJxcHAwZCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/3o84sn09K3V3tmE0xy/giphy.gif",
+        "Жим штанги/гантелей лежа": "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNWVjcnhsdDFldGdtNDJzN3EzbHJ2bTl1eTJ3MnIzYnd2ZXRyN2hsbCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/l3V0wdf36FK23mS1W/giphy.gif",
+        "Приседания со штангой": "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExdWpydGthbTl5ZGlkMDFwbWRua21vZnUwcGF2NmkxaHZmdXkzcXNmciZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/131vvyL7S0aA2A/giphy.gif"
     };
 
     function switchScreen(screenId, btnElement) {
@@ -301,7 +302,7 @@
                 html += `<div class="day-title">${d.name}</div>`;
                 d.list.forEach(exName => {
                     globalExId++;
-                    const gifUrl = demoGifs[exName] || "https://upload.wikimedia.org/wikipedia/commons/b/b8/Pushups.gif";
+                    const gifUrl = demoGifs[exName] || "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExM3pueTRsdW5wY2o3NXpzc2NzcTF2eDRzeTlxbGFmdHFnd3Aza2ZneSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/k3LUpT1I93qms/giphy.gif";
                     
                     html += `<div class="exercise-item">
                         <div class="ex-header">
@@ -309,7 +310,7 @@
                             <span class="ex-sets">${setsCount} подх. × ${repsCount} повт.</span>
                         </div>
                         <div class="demo-btn" onclick="toggleDemo('gif-${globalExId}')">🎬 Техника выполнения</div>
-                        <img id="gif-${globalExId}" class="demo-gif" src="${gifUrl}" alt="${exName}">
+                        <img id="gif-${globalExId}" class="demo-gif" src="${gifUrl}" alt="${exName}" onerror="this.onerror=null; this.src='https://dummyimage.com/400x250/0b1120/00ff88.png&text=Анимация+загружается...';">
                     </div>`;
                 });
             });
