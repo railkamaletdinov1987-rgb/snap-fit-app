@@ -1,5 +1,5 @@
 // Cache version: v8.0 - Force Reset
-const CACHE_NAME = 'snap-fit-cache-v8';
+const CACHE_NAME = 'snap-fit-cache-v9'; // Измените с v8 на v9
 
 self.addEventListener('install', (event) => {
   self.skipWaiting();
