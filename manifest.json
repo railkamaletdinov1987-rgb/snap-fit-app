@@ -1,0 +1,13 @@
+{
+  "background_color": "#060913",
+  "dir": "ltr",
+  "display": "standalone",
+  "name": "Snap &amp; Fit",
+  "orientation": "any",
+  "scope": "/",
+  "short_name": "SnapFit",
+  "start_url": "/",
+  "theme_color": "#060913",
+  "id": "com.snapfit.app",
+  "description": "Snap &amp; Fit - Персональный ИИ фитнес-тренер"
+}
