@@ -69,8 +69,10 @@
         .ex-title { font-weight: 700; font-size: 13px; color: #fff; }
         .ex-sets { font-size: 11px; color: var(--primary); font-weight: 800; }
         
-        .demo-btn { background: rgba(0, 212, 255, 0.15); border: 1px solid rgba(0, 212, 255, 0.4); color: var(--accent); padding: 4px 8px; border-radius: 8px; font-size: 10px; font-weight: 700; cursor: pointer; margin-top: 6px; display: inline-block; }
-        .demo-gif { width: 100%; max-height: 220px; border-radius: 10px; margin-top: 8px; display: none; object-fit: cover; border: 1px solid rgba(255,255,255,0.1); }
+        .demo-btn { background: rgba(0, 212, 255, 0.15); border: 1px solid rgba(0, 212, 255, 0.4); color: var(--accent); padding: 6px 10px; border-radius: 8px; font-size: 11px; font-weight: 700; cursor: pointer; margin-top: 8px; display: inline-block; }
+        
+        .demo-container { display: none; margin-top: 10px; border-radius: 12px; overflow: hidden; border: 1px solid var(--card-border); background: #080c16; text-align: center; padding: 10px; }
+        .demo-img { width: 100%; max-height: 220px; object-fit: contain; border-radius: 8px; }
 
         .ai-response { background: rgba(124, 77, 255, 0.08); border: 1px solid rgba(124, 77, 255, 0.25); border-radius: 16px; padding: 14px; font-size: 13px; line-height: 1.6; color: #e2e8f0; white-space: pre-line; }
         .loader { display: none; text-align: center; padding: 16px; color: var(--accent); font-size: 13px; font-weight: 700; }
@@ -80,7 +82,6 @@
 <body>
 
 <div class="app-container">
-    <!-- Уведомление о новом релизе -->
     <div id="updateBanner" class="update-banner">
         <span>🚀 Новая версия готова!</span>
         <button class="update-btn" onclick="forceAppUpdate()">Обновить</button>
@@ -216,14 +217,14 @@
     let aiAnalysisText = "";
     let swRegistration = null;
 
-    // Прямые проверенные анимации упражнений (без CORS/Giphy блокировок)
+    // Публичные валидные медиафайлы с защитой от блокировки
     const demoGifs = {
-        "Отжимания от пола/колен": "https://upload.wikimedia.org/wikipedia/commons/b/b8/Pushups.gif",
-        "Приседания": "https://upload.wikimedia.org/wikipedia/commons/8/82/Squats.gif",
-        "Планка": "https://upload.wikimedia.org/wikipedia/commons/c/ca/Plank_exercise.gif",
-        "Выпады назад": "https://upload.wikimedia.org/wikipedia/commons/d/d3/Bodyweight_lunges.gif",
-        "Жим штанги/гантелей лежа": "https://upload.wikimedia.org/wikipedia/commons/0/08/Bench-press-1.gif",
-        "Приседания со штангой": "https://upload.wikimedia.org/wikipedia/commons/1/18/Barbell-squat-animation.gif"
+        "Отжимания от пола/колен": "https://images.unsplash.com/photo-1598971639058-fab3c3109a00?w=500&auto=format&fit=crop",
+        "Приседания": "https://images.unsplash.com/photo-1574680096145-d05b474e2155?w=500&auto=format&fit=crop",
+        "Планка": "https://images.unsplash.com/photo-1566241142559-40e1dab266c6?w=500&auto=format&fit=crop",
+        "Выпады назад": "https://images.unsplash.com/photo-1434682881908-b43d0467b798?w=500&auto=format&fit=crop",
+        "Жим штанги/гантелей лежа": "https://images.unsplash.com/photo-1534367507873-d2d7e24c797f?w=500&auto=format&fit=crop",
+        "Приседания со штангой": "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?w=500&auto=format&fit=crop"
     };
 
     function switchScreen(screenId, btnElement) {
@@ -248,10 +249,18 @@
     }
 
     function toggleDemo(id) {
-        const img = document.getElementById(id);
-        if (img) {
-            img.style.display = img.style.display === 'block' ? 'none' : 'block';
+        const box = document.getElementById(id);
+        if (box) {
+            box.style.display = (box.style.display === 'block') ? 'none' : 'block';
         }
+    }
+
+    function handleImageError(imgElement, exName) {
+        imgElement.style.display = 'none';
+        const parent = imgElement.parentElement;
+        parent.innerHTML += `<div style="padding:15px; background:rgba(0,255,136,0.05); border-radius:8px; color:var(--primary); font-size:12px; font-weight:700;">
+            🏋️ Техника: ${exName}<br><span style="color:var(--text-muted); font-size:11px; font-weight:400;">Спина прямая, плавный темп, контроль дыхания.</span>
+        </div>`;
     }
 
     function calculatePersonalMetrics() {
@@ -315,15 +324,17 @@
                 html += `<div class="day-title">${d.name}</div>`;
                 d.list.forEach(exName => {
                     globalExId++;
-                    const gifUrl = demoGifs[exName] || "https://upload.wikimedia.org/wikipedia/commons/b/b8/Pushups.gif";
+                    const imgUrl = demoGifs[exName] || "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?w=500&auto=format&fit=crop";
                     
                     html += `<div class="exercise-item">
                         <div class="ex-header">
                             <span class="ex-title">${exName}</span>
                             <span class="ex-sets">${setsCount} подх. × ${repsCount} повт.</span>
                         </div>
-                        <div class="demo-btn" onclick="toggleDemo('gif-${globalExId}')">🎬 Техника выполнения</div>
-                        <img id="gif-${globalExId}" class="demo-gif" src="${gifUrl}" alt="${exName}" loading="lazy">
+                        <div class="demo-btn" onclick="toggleDemo('demo-${globalExId}')">🎬 Техника выполнения</div>
+                        <div id="demo-${globalExId}" class="demo-container">
+                            <img class="demo-img" src="${imgUrl}" alt="${exName}" referrerpolicy="no-referrer" onerror="handleImageError(this, '${exName}')">
+                        </div>
                     </div>`;
                 });
             });
@@ -387,7 +398,7 @@
         }
     }
 
-    // Логика автоматического обнаружения обновлений
+    // Регистрация Service Worker
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('pwabuilder-sw.js').then(reg => {
             swRegistration = reg;
@@ -411,7 +422,7 @@
         });
     }
 
-    // Принудительный сброс кэша
+    // Функция принудительного обновления
     async function forceAppUpdate() {
         if ('caches' in window) {
             const cacheNames = await caches.keys();
