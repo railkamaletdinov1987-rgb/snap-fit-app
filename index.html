@@ -26,9 +26,14 @@
         * { box-sizing: border-box; transition: all 0.25s ease; }
         body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 0; display: flex; justify-content: center; min-height: 100vh; }
         .app-container { width: 100%; max-width: 480px; padding: 20px 16px 95px 16px; }
-        .header { text-align: center; margin-bottom: 20px; }
-        .header h1 { font-size: 24px; font-weight: 800; background: linear-gradient(135deg, #fff, var(--primary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin: 0; }
         
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .header h1 { font-size: 24px; font-weight: 800; background: linear-gradient(135deg, #fff, var(--primary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin: 0; }
+        .btn-reload { background: rgba(255, 255, 255, 0.08); border: 1px solid var(--card-border); color: #fff; padding: 6px 12px; border-radius: 12px; font-size: 11px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 4px; }
+        
+        .update-banner { display: none; background: rgba(0, 212, 255, 0.15); border: 1px solid var(--accent); padding: 12px 16px; border-radius: 16px; margin-bottom: 16px; font-size: 12px; font-weight: 700; color: #fff; justify-content: space-between; align-items: center; }
+        .update-btn { background: var(--gradient-btn); border: none; padding: 6px 12px; border-radius: 10px; font-weight: 800; cursor: pointer; color: #060913; font-size: 11px; text-transform: uppercase; }
+
         .card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 24px; padding: 20px; margin-bottom: 16px; backdrop-filter: blur(16px); }
         h2 { font-size: 17px; font-weight: 800; margin-top: 0; margin-bottom: 14px; color: #fff; }
         label { display: block; font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px; }
@@ -75,8 +80,15 @@
 <body>
 
 <div class="app-container">
+    <!-- Уведомление о новом релизе -->
+    <div id="updateBanner" class="update-banner">
+        <span>🚀 Новая версия готова!</span>
+        <button class="update-btn" onclick="forceAppUpdate()">Обновить</button>
+    </div>
+
     <div class="header">
         <h1>Snap & Fit AI</h1>
+        <button class="btn-reload" onclick="forceAppUpdate()">🔄 Обновить</button>
     </div>
 
     <!-- 1. ПРОФИЛЬ -->
@@ -202,8 +214,8 @@
     const SERVER_URL = 'https://snap-fit-backend.onrender.com/api/analyze';
     let photoBase64 = null;
     let aiAnalysisText = "";
+    let swRegistration = null;
 
-    // Прямые публичные ссылки на GIF с надежными CDN
     const demoGifs = {
         "Отжимания от пола/колен": "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExM3pueTRsdW5wY2o3NXpzc2NzcTF2eDRzeTlxbGFmdHFnd3Aza2ZneSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/k3LUpT1I93qms/giphy.gif",
         "Приседания": "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExdWpydGthbTl5ZGlkMDFwbWRua21vZnUwcGF2NmkxaHZmdXkzcXNmciZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/131vvyL7S0aA2A/giphy.gif",
@@ -374,8 +386,45 @@
         }
     }
 
+    // Логика автоматического обнаружения обновлений и сброса кэша
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('pwabuilder-sw.js');
+        navigator.serviceWorker.register('pwabuilder-sw.js').then(reg => {
+            swRegistration = reg;
+            reg.addEventListener('updatefound', () => {
+                const newWorker = reg.installing;
+                newWorker.addEventListener('statechange', () => {
+                    if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                        const banner = document.getElementById('updateBanner');
+                        if (banner) banner.style.display = 'flex';
+                    }
+                });
+            });
+        });
+
+        let isRefreshing = false;
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+            if (!isRefreshing) {
+                isRefreshing = true;
+                window.location.reload();
+            }
+        });
+    }
+
+    // Принудительное обновление по кнопке
+    async function forceAppUpdate() {
+        if ('caches' in window) {
+            const cacheNames = await caches.keys();
+            await Promise.all(cacheNames.map(name => caches.delete(name)));
+        }
+
+        if (swRegistration) {
+            await swRegistration.update();
+            if (swRegistration.waiting) {
+                swRegistration.waiting.postMessage({ type: 'SKIP_WAITING' });
+            }
+        }
+
+        window.location.reload(true);
     }
 </script>
 </body>
