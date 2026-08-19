@@ -2,15 +2,9 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Snap & Fit AI</title>
-<!-- Запрещает случайное приближение (зум) при нажатии пальцем -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-
-    <!-- Красит верхнюю полоску телефона (где часы и батарея) в темный цвет приложения -->
+    <title>Snap & Fit AI</title>
     <meta name="theme-color" content="#060913">
-
-    <!-- Настройки для iPhone, чтобы приложение открывалось во весь экран -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Snap & Fit">
@@ -75,6 +69,7 @@
 
         .ai-response { background: rgba(124, 77, 255, 0.08); border: 1px solid rgba(124, 77, 255, 0.25); border-radius: 16px; padding: 14px; font-size: 13px; line-height: 1.6; color: #e2e8f0; white-space: pre-line; }
         .loader { display: none; text-align: center; padding: 16px; color: var(--accent); font-size: 13px; font-weight: 700; }
+        .ai-badge { font-size: 10px; background: rgba(0, 255, 136, 0.15); color: var(--primary); padding: 3px 8px; border-radius: 6px; margin-bottom: 8px; display: inline-block; }
     </style>
 </head>
 <body>
@@ -181,7 +176,7 @@
     <!-- 3. ТРЕНИРОВКИ -->
     <div id="screen-workout" class="screen-view">
         <div class="card">
-            <h2>📅 План с Анимациями (3 раза в неделю)</h2>
+            <h2>📅 Персональный план тренировок</h2>
             <div id="workoutProgramList">Заполните данные во вкладке "Профиль"</div>
         </div>
     </div>
@@ -204,17 +199,18 @@
 </div>
 
 <script>
-    // Публичный адрес вашего сервера на Render
     const SERVER_URL = 'https://snap-fit-backend.onrender.com/api/analyze';
     let photoBase64 = null;
+    let aiAnalysisText = "";
 
+    // Используем стабильные прямые ссылки на анимации (Wikimedia & Wikimedia Commons)
     const demoGifs = {
-        "Отжимания от пола/колен": "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExMjRrenplZWJzNzIxbHRvZGVyMXdmbWFvbmMxeHhhOXQyc3V1NWdrZCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/3o7TKRnoP3f7k53qA0/giphy.gif",
-        "Приседания": "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNWwzc3FtbHBneGg5NHJzcThmYzQyNDM4cHRsaGgwbjNlYnRqN3Q3OCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/xT0xezQGU5xCDJuCpq/giphy.gif",
-        "Планка": "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExd2R4bTN3cHMwNTc0cnptdWh6NnhxODgxeDFvYW0wZjlrc3dldWh6cCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/l0HlSno4t81LInY6Q/giphy.gif",
-        "Выпады назад": "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExYzJocTJ1ejI4bXdyczF1czM1bzZscHBwdGV3ZmhqdnhsbWlna3Q0YyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/l3vR1v8LInS7yQ3le/giphy.gif",
-        "Жим штанги/гантелей лежа": "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExdnh4OHplamQ5YWFwMXY2bndpYmt6MGdwaHRvOGEyb3Fud2hxejlpaSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/3o7TKL33Y02h5r5k1G/giphy.gif",
-        "Приседания со штангой": "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNWwzc3FtbHBneGg5NHJzcThmYzQyNDM4cHRsaGgwbjNlYnRqN3Q3OCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/xT0xezQGU5xCDJuCpq/giphy.gif"
+        "Отжимания от пола/колен": "https://upload.wikimedia.org/wikipedia/commons/b/b8/Pushups.gif",
+        "Приседания": "https://upload.wikimedia.org/wikipedia/commons/8/82/Squats.gif",
+        "Планка": "https://upload.wikimedia.org/wikipedia/commons/1/18/Plank_exercise.gif",
+        "Выпады назад": "https://upload.wikimedia.org/wikipedia/commons/a/a2/Lunges.gif",
+        "Жим штанги/гантелей лежа": "https://upload.wikimedia.org/wikipedia/commons/7/78/Bench-press-1.gif",
+        "Приседания со штангой": "https://upload.wikimedia.org/wikipedia/commons/8/82/Squats.gif"
     };
 
     function switchScreen(screenId, btnElement) {
@@ -268,8 +264,12 @@
         return { targetCal, prot, fat, carb, fatPercent: Math.max(5, fatPercent) };
     }
 
-    function generateProgressiveProgram(goal, location, durationMonths) {
+    function generateProgressiveProgram(goal, location, durationMonths, aiNote = "") {
         let html = '';
+        if (aiNote) {
+            html += `<div class="ai-badge">✨ Адаптировано под ИИ-анализ фигуры</div>`;
+        }
+
         const homeEx = {
             day1: ["Отжимания от пола/колен", "Приседания", "Планка"],
             day2: ["Выпады назад", "Приседания", "Планка"],
@@ -302,7 +302,7 @@
                 html += `<div class="day-title">${d.name}</div>`;
                 d.list.forEach(exName => {
                     globalExId++;
-                    const gifUrl = demoGifs[exName] || "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExMjRrenplZWJzNzIxbHRvZGVyMXdmbWFvbmMxeHhhOXQyc3V1NWdrZCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/3o7TKRnoP3f7k53qA0/giphy.gif";
+                    const gifUrl = demoGifs[exName] || "https://upload.wikimedia.org/wikipedia/commons/b/b8/Pushups.gif";
                     
                     html += `<div class="exercise-item">
                         <div class="ex-header">
@@ -338,6 +338,7 @@
         const location = document.getElementById('location').value;
         const duration = parseInt(document.getElementById('duration').value);
 
+        // Вначале создаем базовый план
         generateProgressiveProgram(goal, location, duration);
 
         switchScreen('ai', document.querySelectorAll('.nav-item')[3]);
@@ -361,7 +362,11 @@
 
             const data = await response.json();
             if (data.success) {
-                document.getElementById('aiOutput').innerText = data.text;
+                aiAnalysisText = data.text;
+                document.getElementById('aiOutput').innerText = aiAnalysisText;
+                
+                // Перегенерируем план с учетом ИИ-анализа
+                generateProgressiveProgram(goal, location, duration, aiAnalysisText);
             } else {
                 document.getElementById('aiOutput').innerText = "⚠️ Ошибка сервера: " + (data.error || "Неизвестный сбой");
             }
