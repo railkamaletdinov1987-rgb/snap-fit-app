@@ -38,6 +38,10 @@
     <div id="screen-profile" class="screen-view active">
         <div class="card">
             <h2>🤖 Настройка параметров</h2>
+            
+            <!-- Кнопка обновления приложения прямо на старте -->
+            <button class="btn" style="background: rgba(255,255,255,0.1); color: #00d4ff; margin-bottom: 14px;" onclick="forceAppUpdate()">🔄 Обновить версию приложения</button>
+
             <p>Укажите свои данные для персонального ИИ-плана:</p>
             
             <label>Пол</label>
@@ -81,11 +85,9 @@
             
             <div id="monthsList"></div>
 
-            <!-- Кнопка обновления / пересчета плана -->
-            <button class="btn" style="background: linear-gradient(135deg, #00d4ff 0%, #7c4dff 100%); color: #fff;" onclick="generateAIProgram()">🔄 Обновить / Пересчитать план</button>
-
-            <button class="btn nav-tab" onclick="switchScreen('screen-water')" style="margin-top: 14px;">💧 Трекер воды</button>
+            <button class="btn nav-tab" onclick="switchScreen('screen-water')">💧 Трекер воды</button>
             <button class="btn nav-tab" onclick="switchScreen('screen-calories')">🍎 Учет калорий (ИИ)</button>
+            <button class="btn nav-tab" style="background: rgba(0, 212, 255, 0.1); border-color: #00d4ff; color: #00d4ff;" onclick="forceAppUpdate()">🔄 Обновить версию приложения</button>
             <button class="btn back-btn" onclick="switchScreen('screen-profile')">⚙️ Изменить параметры</button>
         </div>
     </div>
@@ -96,14 +98,12 @@
             <h2 id="monthTitle" style="font-size: 16px; margin-bottom: 10px;">Расписание</h2>
             <p>Выберите день недели, чтобы открыть упражнения:</p>
             
-            <!-- Вкладки дней -->
             <div style="display: flex; gap: 6px; margin-bottom: 14px;">
                 <button class="btn day-tab active-day" id="tabDay1" onclick="selectDay(1)" style="margin:0; padding: 10px; font-size: 12px; text-align:center; justify-content:center;">День 1 (Пн)</button>
                 <button class="btn day-tab" id="tabDay2" onclick="selectDay(2)" style="margin:0; padding: 10px; font-size: 12px; text-align:center; justify-content:center;">День 2 (Ср)</button>
                 <button class="btn day-tab" id="tabDay3" onclick="selectDay(3)" style="margin:0; padding: 10px; font-size: 12px; text-align:center; justify-content:center;">День 3 (Пт)</button>
             </div>
 
-            <!-- Контент выбранного дня -->
             <div id="dayContentContainer"></div>
 
             <button class="btn back-btn" onclick="switchScreen('screen-main')">⬅ Назад к меню месяцев</button>
@@ -164,6 +164,19 @@
 <script>
     const SERVER_URL = 'https://snap-fit-backend.onrender.com';
     let userState = { water: 0, waterTarget: 2500, calories: 0, calorieTarget: 2000, currentMonth: 1 };
+
+    // Функция полного принудительного обновления приложения (сбрасывает кеш браузера)
+    function forceAppUpdate() {
+        if ('caches' in window) {
+            caches.keys().then((names) => {
+                names.forEach((name) => {
+                    caches.delete(name);
+                });
+            });
+        }
+        // Перезагрузка страницы с добавлением таймстампа, чтобы телефон гарантированно скачал свежий файл
+        window.location.href = window.location.href.split('?')[0] + '?v=' + new Date().getTime();
+    }
 
     function switchScreen(screenId) {
         document.querySelectorAll('.screen-view').forEach(s => s.classList.remove('active'));
