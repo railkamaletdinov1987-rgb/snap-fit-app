@@ -16,72 +16,31 @@
         input:focus, select:focus { border-color: var(--primary); }
         .btn { width: 100%; padding: 14px; border-radius: 16px; border: none; background: var(--gradient-btn); color: #060913; font-weight: 800; cursor: pointer; text-transform: uppercase; margin-top: 8px; font-size: 14px; transition: opacity 0.2s; }
         .btn:hover { opacity: 0.9; }
-        .btn-month { background: rgba(255, 255, 255, 0.06); border: 1px solid var(--card-border); color: #fff; margin-bottom: 10px; text-align: left; display: flex; justify-content: space-between; align-items: center; font-weight: 700; }
-        .btn-month:hover { background: rgba(0, 255, 136, 0.12); border-color: var(--primary); }
+        .btn-month, .nav-tab { background: rgba(255, 255, 255, 0.06); border: 1px solid var(--card-border); color: #fff; margin-bottom: 10px; text-align: left; display: flex; justify-content: space-between; align-items: center; font-weight: 700; }
+        .btn-month:hover, .nav-tab:hover { background: rgba(0, 255, 136, 0.12); border-color: var(--primary); }
         .screen-view { display: none; }
         .screen-view.active { display: block; }
-        .ai-response { background: rgba(124, 77, 255, 0.08); border: 1px solid rgba(124, 77, 255, 0.25); border-radius: 16px; padding: 16px; font-size: 13px; line-height: 1.6; white-space: pre-line; color: #e2e8f0; max-height: 60vh; overflow-y: auto; }
+        .ai-response { background: rgba(124, 77, 255, 0.08); border: 1px solid rgba(124, 77, 255, 0.25); border-radius: 16px; padding: 16px; font-size: 13px; line-height: 1.6; white-space: pre-line; color: #e2e8f0; max-height: 50vh; overflow-y: auto; }
         .back-btn { background: rgba(255, 255, 255, 0.08); border: 1px solid var(--card-border); color: #fff; margin-top: 16px; }
         .week-item { background: rgba(8, 12, 22, 0.6); padding: 14px; border-radius: 14px; margin-bottom: 10px; border: 1px solid rgba(255,255,255,0.06); font-size: 13px; line-height: 1.5; }
         .week-item b { color: var(--primary); display: block; margin-bottom: 4px; font-size: 14px; }
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+        .stat-box { background: rgba(8, 12, 22, 0.7); border: 1px solid var(--card-border); padding: 12px; border-radius: 14px; text-align: center; }
+        .stat-box b { color: var(--primary); font-size: 16px; display: block; margin-top: 4px; }
     </style>
 </head>
 <body>
 
 <div class="app-container">
 
-    <!-- ЭКРАН 1: ГЛАВНАЯ (ВЫБОР МЕСЯЦЕВ) -->
-    <div id="screen-months" class="screen-view active">
+    <!-- ЭКРАН 1: АНКЕТА ПАРАМЕТРОВ -->
+    <div id="screen-profile" class="screen-view active">
         <div class="card">
-            <h2>📅 Ваша программа</h2>
-            <p>Выберите месяц для просмотра детального недельного расписания тренировок:</p>
-            
-            <button class="btn btn-month" onclick="openMonth('Месяц 1: Базовый адаптационный период')">
-                <span>Месяц 1 (База)</span> <span>➡️</span>
-            </button>
-            <button class="btn btn-month" onclick="openMonth('Месяц 2: Увеличение интенсивности')">
-                <span>Месяц 2 (Прогресс)</span> <span>➡️</span>
-            </button>
-            <button class="btn btn-month" onclick="openMonth('Месяц 3: Пиковая форма и рельеф')">
-                <span>Месяц 3 (Интенсив)</span> <span>➡️</span>
-            </button>
-
-            <button class="btn" style="margin-top: 24px;" onclick="switchScreen('screen-profile')">🤖 Настроить план с ИИ</button>
-        </div>
-    </div>
-
-    <!-- ЭКРАН 2: НЕДЕЛЬНОЕ РАСПИСАНИЕ -->
-    <div id="screen-schedule" class="screen-view">
-        <div class="card">
-            <h2 id="monthTitle" style="font-size: 16px;">Расписание</h2>
-            
-            <div class="week-item">
-                <b>Понедельник — День 1</b>
-                Верх тела: Жим гантелей лежа (3х10), Тяга гантелей в наклоне (3х12), Отжимания (3 на максимум).
-            </div>
-            <div class="week-item">
-                <b>Среда — День 2</b>
-                Низ тела: Приседания с собственным весом/отягощением (4х12), Выпады (3х10 на каждую ногу), Ягодичный мостик (3х15).
-            </div>
-            <div class="week-item">
-                <b>Пятница — День 3</b>
-                Всё тело + Кор: Планка (3 подхода по 45 сек), Скручивания (3х20), Кардио/Интервальная нагрузка (15 минут).
-            </div>
-            
-            <button class="btn back-btn" onclick="switchScreen('screen-months')">⬅ Назад к месяцам</button>
-        </div>
-    </div>
-
-    <!-- ЭКРАН 3: НАСТРОЙКИ ДЛЯ ИИ -->
-    <div id="screen-profile" class="screen-view">
-        <div class="card">
-            <h2>👤 Параметры для ИИ</h2>
+            <h2>🤖 Настройка параметров</h2>
+            <p>Укажите свои данные для персонального ИИ-плана:</p>
             
             <label>Пол</label>
-            <select id="gender">
-                <option value="Мужчина">Мужчина</option>
-                <option value="Женщина">Женщина</option>
-            </select>
+            <select id="gender"><option value="Мужчина">Мужчина</option><option value="Женщина">Женщина</option></select>
 
             <label>Возраст</label>
             <input type="number" id="age" value="25">
@@ -96,41 +55,104 @@
             <select id="goal">
                 <option value="Постройнеть и сбросить вес">Постройнеть / Сбросить вес</option>
                 <option value="Набрать мышечную массу">Набрать мышечную массу</option>
-                <option value="Поддерживать форму и тонус">Поддерживать форму</option>
+                <option value="Сделать рельеф и тонус">Сделать рельеф</option>
             </select>
 
             <label>Локация тренировок</label>
-            <select id="location">
-                <option value="Дома">Дома</option>
-                <option value="В тренажерном зале">В зале</option>
+            <select id="location"><option value="Дома">Дома</option><option value="В тренажерном зале">В зале</option></select>
+
+            <label>Период программы</label>
+            <select id="durationMonths">
+                <option value="1">1 месяц (Старт)</option>
+                <option value="3" selected>3 месяца (Оптимально)</option>
+                <option value="6">6 месяцев (Трансформация)</option>
             </select>
 
-            <button class="btn" onclick="generateAIProgram()">⚡ Сгенерировать план</button>
-            <button class="btn back-btn" onclick="switchScreen('screen-months')">⬅ На главную</button>
+            <button class="btn" onclick="generateAIProgram()">⚡ Рассчитать с ИИ</button>
         </div>
     </div>
-    
-    <!-- ЭКРАН 4: ОТВЕТ ИИ -->
+
+    <!-- ЭКРАН 2: ГЛАВНОЕ МЕНЮ И ТРЕНИРОВКИ -->
+    <div id="screen-main" class="screen-view">
+        <div class="card">
+            <h2>🏋️‍♂️ Ваша программа</h2>
+            <p id="userSummary">Индивидуальный план готов.</p>
+            
+            <div id="monthsList"></div>
+
+            <button class="btn nav-tab" onclick="switchScreen('screen-water')">💧 Трекер воды</button>
+            <button class="btn nav-tab" onclick="switchScreen('screen-calories')">🍎 Учет калорий (ИИ)</button>
+            <button class="btn back-btn" onclick="switchScreen('screen-profile')">⚙️ Изменить параметры</button>
+        </div>
+    </div>
+
+    <!-- ЭКРАН 3: РАСПИСАНИЕ ДНЕЙ -->
+    <div id="screen-schedule" class="screen-view">
+        <div class="card">
+            <h2 id="monthTitle" style="font-size: 16px;">Расписание</h2>
+            <div id="scheduleContent"></div>
+            <button class="btn back-btn" onclick="switchScreen('screen-main')">⬅ Назад к меню</button>
+        </div>
+    </div>
+
+    <!-- ЭКРАН 4: ТРЕКЕР ВОДЫ -->
+    <div id="screen-water" class="screen-view">
+        <div class="card">
+            <h2>💧 Контроль воды</h2>
+            <p id="waterRecommendation">Рекомендация ИИ: выпейте 2500 мл воды в сутки.</p>
+            
+            <div class="stats-grid">
+                <div class="stat-box">Выпито<b id="currentWater">0 мл</b></div>
+                <div class="stat-box">Норма<b id="targetWater">2500 мл</b></div>
+            </div>
+
+            <button class="btn" onclick="addWater(250)">+ 250 мл (Стакан)</button>
+            <button class="btn" style="background: rgba(255,255,255,0.1); color:#fff;" onclick="addWater(500)">+ 500 мл (Бутылка)</button>
+            
+            <button class="btn back-btn" onclick="switchScreen('screen-main')">⬅ Назад в меню</button>
+        </div>
+    </div>
+
+    <!-- ЭКРАН 5: УЧЕТ КАЛОРИЙ И ИИ-АНАЛИЗ БЛЮД -->
+    <div id="screen-calories" class="screen-view">
+        <div class="card">
+            <h2>🍎 Учет калорий с ИИ</h2>
+            <div class="stats-grid">
+                <div class="stat-box">Потреблено<b id="totalCals">0 ккал</b></div>
+                <div class="stat-box">Норма дня<b id="targetCals">2000 ккал</b></div>
+            </div>
+
+            <label>Что вы съели или выпили?</label>
+            <input type="text" id="foodInput" placeholder="Например: Овсянка с бананом и кофе">
+
+            <label>Или загрузите фото блюда:</label>
+            <input type="file" id="foodImage" accept="image/*" style="padding: 8px;">
+
+            <button class="btn" onclick="analyzeFoodWithAI()">🔍 Распознать и добавить</button>
+            
+            <div id="foodResult" style="margin-top: 14px;"></div>
+            
+            <button class="btn back-btn" onclick="switchScreen('screen-main')">⬅ Назад в меню</button>
+        </div>
+    </div>
+
+    <!-- ЭКРАН 6: ПОЛНЫЙ ОТВЕТ ИИ -->
     <div id="screen-ai" class="screen-view">
         <div class="card">
-            <h2>🤖 План от Snap & Fit AI</h2>
-            <div class="ai-response" id="aiOutput">Искусственный интеллект персонально формирует ваш график...</div>
-            <button class="btn back-btn" onclick="switchScreen('screen-profile')">⬅ Назад к настройкам</button>
+            <h2>🤖 Полный ИИ-план</h2>
+            <div class="ai-response" id="aiOutput">Анализ данных...</div>
+            <button class="btn back-btn" onclick="switchScreen('screen-main')">⬅ К программе</button>
         </div>
     </div>
 </div>
 
 <script>
-    const SERVER_URL = 'https://snap-fit-backend.onrender.com/api/analyze';
+    const SERVER_URL = 'https://snap-fit-backend.onrender.com';
+    let userState = { water: 0, waterTarget: 2500, calories: 0, calorieTarget: 2000, generatedText: "" };
 
     function switchScreen(screenId) {
         document.querySelectorAll('.screen-view').forEach(s => s.classList.remove('active'));
         document.getElementById(screenId).classList.add('active');
-    }
-
-    function openMonth(monthName) {
-        document.getElementById('monthTitle').innerText = monthName;
-        switchScreen('screen-schedule');
     }
 
     async function generateAIProgram() {
@@ -140,29 +162,130 @@
         const weight = document.getElementById('weight').value;
         const goal = document.getElementById('goal').value;
         const location = document.getElementById('location').value;
+        const durationMonths = document.getElementById('durationMonths').value;
+
+        // Расчет нормы воды и калорий под пользователя
+        userState.waterTarget = weight * 35; // 35 мл на кг
+        userState.calorieTarget = goal.includes('массу') ? (weight * 30 + 300) : (weight * 24 - 300);
         
-        const out = document.getElementById('aiOutput');
-        
+        document.getElementById('targetWater').innerText = userState.waterTarget + " мл";
+        document.getElementById('waterRecommendation').innerText = `Рекомендация ИИ: ваша суточная норма питья составляет ${userState.waterTarget} мл.`;
+        document.getElementById('targetCals').innerText = Math.round(userState.calorieTarget) + " ккал";
+
         switchScreen('screen-ai');
-        out.innerText = "Искусственный интеллект анализирует ваши параметры и выстраивает детальный план тренировок...";
+        document.getElementById('aiOutput').innerText = "Искусственный интеллект персонально рассчитывает вашу программу тренировок и питания...";
 
         try {
-            const response = await fetch(SERVER_URL, {
+            const response = await fetch(`${SERVER_URL}/api/analyze`, {
                 method: 'POST',
-                mode: 'cors',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ gender, age, height, weight, goal, location, durationMonths: 3 })
+                body: JSON.stringify({ gender, age, height, weight, goal, location, durationMonths })
             });
 
             const json = await response.json();
-
             if (!response.ok) {
-                out.innerText = "❌ Ошибка сервера: " + (json.error || response.status);
+                document.getElementById('aiOutput').innerText = "❌ Ошибка: " + (json.error || response.status);
             } else {
-                out.innerText = json.text;
+                userState.generatedText = json.text;
+                document.getElementById('aiOutput').innerText = json.text;
+                buildMonthsMenu(durationMonths);
+                document.getElementById('userSummary').innerText = `Цель: ${goal} • Срок: ${durationMonths} мес.`;
             }
         } catch (e) {
-            out.innerText = "❌ Ошибка сети: не удалось связаться с сервером. Убедитесь, что сервер активен.";
+            document.getElementById('aiOutput').innerText = "❌ Ошибка соединения с сервером.";
+        }
+    }
+
+    function buildMonthsMenu(monthsCount) {
+        const container = document.getElementById('monthsList');
+        container.innerHTML = '';
+        
+        for (let i = 1; i <= monthsCount; i++) {
+            const btn = document.createElement('button');
+            btn.className = 'btn btn-month';
+            btn.innerHTML = `<span>Месяц ${i} (Программа)</span> <span>➡️</span>`;
+            btn.onclick = () => openMonthDetails(i);
+            container.appendChild(btn);
+        }
+    }
+
+    function openMonthDetails(monthNum) {
+        document.getElementById('monthTitle').innerText = `Месяц ${monthNum}: План тренировок`;
+        const content = document.getElementById('scheduleContent');
+        
+        content.innerHTML = `
+            <div class="week-item">
+                <b>Понедельник — День 1 (Силовая / База)</b>
+                Разминка (5 мин). Основные упражнения под ваши цели (3 подхода по 10-12 повторений). Заминка и растяжка.
+            </div>
+            <div class="week-item">
+                <b>Среда — День 2 (Функциональная / Тонус)</b>
+                Проработка мышц-стабилизаторов, кардио-элементы или работа с собственным весом (3-4 круга).
+            </div>
+            <div class="week-item">
+                <b>Пятница — День 3 (Интенсив / Кор)</b>
+                Комплексная нагрузка на всё тело, упражнения на пресс, заминка и контроль пульса.
+            </div>
+            <p style="margin-top:10px; color: var(--accent);">💡 ИИ советует строго соблюдать режим отдыха между подходами (60-90 сек).</p>
+        `;
+        switchScreen('screen-schedule');
+    }
+
+    function addWater(amount) {
+        userState.water += amount;
+        document.getElementById('currentWater').innerText = userState.water + " мл";
+    }
+
+    async function analyzeFoodWithAI() {
+        const foodDescription = document.getElementById('foodInput').value;
+        const fileInput = document.getElementById('foodImage');
+        const resultDiv = document.getElementById('foodResult');
+
+        if (!foodDescription && fileInput.files.length === 0) {
+            alert('Введите описание блюда или загрузите фото!');
+            return;
+        }
+
+        resultDiv.innerHTML = "⏳ ИИ анализирует блюдо и считает калории...";
+
+        let imageBase64 = "";
+        if (fileInput.files.length > 0) {
+            const file = fileInput.files[0];
+            imageBase64 = await new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.onload = (e) => resolve(e.target.result);
+                reader.readAsDataURL(file);
+            });
+        }
+
+        try {
+            const response = await fetch(`${SERVER_URL}/api/calories`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ foodDescription, imageBase64 })
+            });
+
+            const json = await response.json();
+            if (json.success) {
+                const item = json.data;
+                userState.calories += item.calories;
+                document.getElementById('totalCals').innerText = userState.calories + " ккал";
+
+                resultDiv.innerHTML = `
+                    <div class="week-item" style="border-color: var(--primary);">
+                        <b>🍽️ ${item.name}</b>
+                        Калории: <b>${item.calories} ккал</b><br>
+                        Белки: ${item.protein}г | Жиры: ${item.fat}г | Углеводы: ${item.carbs}г<br>
+                        <i style="color: var(--accent);">${item.advice}</i>
+                    </div>
+                `;
+                document.getElementById('foodInput').value = "";
+                fileInput.value = "";
+            } else {
+                resultDiv.innerHTML = "❌ Не удалось распознать блюдо.";
+            }
+        } catch (e) {
+            resultDiv.innerHTML = "❌ Ошибка связи с сервером.";
         }
     }
 </script>
