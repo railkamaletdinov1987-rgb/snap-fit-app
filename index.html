@@ -81,7 +81,10 @@
             
             <div id="monthsList"></div>
 
-            <button class="btn nav-tab" onclick="switchScreen('screen-water')">💧 Трекер воды</button>
+            <!-- Кнопка обновления / пересчета плана -->
+            <button class="btn" style="background: linear-gradient(135deg, #00d4ff 0%, #7c4dff 100%); color: #fff;" onclick="generateAIProgram()">🔄 Обновить / Пересчитать план</button>
+
+            <button class="btn nav-tab" onclick="switchScreen('screen-water')" style="margin-top: 14px;">💧 Трекер воды</button>
             <button class="btn nav-tab" onclick="switchScreen('screen-calories')">🍎 Учет калорий (ИИ)</button>
             <button class="btn back-btn" onclick="switchScreen('screen-profile')">⚙️ Изменить параметры</button>
         </div>
@@ -222,18 +225,16 @@
     function openMonthDetails(monthNum) {
         userState.currentMonth = monthNum;
         document.getElementById('monthTitle').innerText = `Месяц ${monthNum}: Выберите день`;
-        selectDay(1); // по умолчанию открываем День 1
+        selectDay(1);
         switchScreen('screen-schedule');
     }
 
     function selectDay(dayNum) {
-        // Переключаем активную вкладку
         document.querySelectorAll('.day-tab').forEach(el => el.classList.remove('active-day'));
         document.getElementById(`tabDay${dayNum}`).classList.add('active-day');
 
         const container = document.getElementById('dayContentContainer');
         
-        // Генерируем наполнение упражнений в зависимости от месяца и дня
         let exercisesHTML = "";
         if (dayNum === 1) {
             exercisesHTML = `
