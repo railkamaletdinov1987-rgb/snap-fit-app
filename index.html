@@ -5,63 +5,77 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Snap & Fit AI</title>
     <style>
-        :root { --bg: #060913; --card-bg: rgba(18, 24, 40, 0.85); --card-border: rgba(255, 255, 255, 0.12); --primary: #00ff88; --accent: #00d4ff; --text: #f8fafc; --gradient-btn: linear-gradient(135deg, #00ff88 0%, #00d4ff 100%); }
-        body { font-family: sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; display: flex; justify-content: center; min-height: 100vh; }
+        :root { --bg: #060913; --card-bg: rgba(18, 24, 40, 0.9); --card-border: rgba(255, 255, 255, 0.12); --primary: #00ff88; --accent: #00d4ff; --text: #f8fafc; --gradient-btn: linear-gradient(135deg, #00ff88 0%, #00d4ff 100%); }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 16px; display: flex; justify-content: center; min-height: 100vh; }
         .app-container { width: 100%; max-width: 480px; }
-        .card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 24px; padding: 20px; margin-bottom: 16px; box-shadow: 0 8px 32px rgba(0,0,0,0.4); }
-        h2 { font-size: 18px; font-weight: 800; margin-top: 0; margin-bottom: 14px; color: #fff; }
+        .card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 24px; padding: 20px; margin-bottom: 16px; box-shadow: 0 8px 32px rgba(0,0,0,0.5); backdrop-filter: blur(10px); }
+        h2 { font-size: 20px; font-weight: 800; margin-top: 0; margin-bottom: 14px; color: #fff; display: flex; align-items: center; gap: 8px; }
+        p { color: #94a3b8; font-size: 13px; line-height: 1.4; }
         label { display: block; font-size: 11px; font-weight: 700; text-transform: uppercase; color: #94a3b8; margin-bottom: 6px; }
         input, select { width: 100%; padding: 12px 14px; border-radius: 14px; border: 1px solid rgba(255, 255, 255, 0.12); background: rgba(8, 12, 22, 0.7); color: #fff; font-size: 14px; font-weight: 600; outline: none; margin-bottom: 12px; box-sizing: border-box; }
-        .btn { width: 100%; padding: 14px; border-radius: 16px; border: none; background: var(--gradient-btn); color: #060913; font-weight: 800; cursor: pointer; text-transform: uppercase; margin-top: 8px; font-size: 14px; }
-        .btn-month { background: rgba(255, 255, 255, 0.08); border: 1px solid var(--card-border); color: #fff; margin-bottom: 10px; text-align: left; display: flex; justify-content: space-between; align-items: center; }
-        .btn-month:hover { background: rgba(0, 255, 136, 0.15); border-color: var(--primary); }
+        input:focus, select:focus { border-color: var(--primary); }
+        .btn { width: 100%; padding: 14px; border-radius: 16px; border: none; background: var(--gradient-btn); color: #060913; font-weight: 800; cursor: pointer; text-transform: uppercase; margin-top: 8px; font-size: 14px; transition: opacity 0.2s; }
+        .btn:hover { opacity: 0.9; }
+        .btn-month { background: rgba(255, 255, 255, 0.06); border: 1px solid var(--card-border); color: #fff; margin-bottom: 10px; text-align: left; display: flex; justify-content: space-between; align-items: center; font-weight: 700; }
+        .btn-month:hover { background: rgba(0, 255, 136, 0.12); border-color: var(--primary); }
         .screen-view { display: none; }
         .screen-view.active { display: block; }
-        .ai-response { background: rgba(124, 77, 255, 0.08); border: 1px solid rgba(124, 77, 255, 0.25); border-radius: 16px; padding: 16px; font-size: 14px; line-height: 1.5; white-space: pre-line; color: #e2e8f0; }
+        .ai-response { background: rgba(124, 77, 255, 0.08); border: 1px solid rgba(124, 77, 255, 0.25); border-radius: 16px; padding: 16px; font-size: 13px; line-height: 1.6; white-space: pre-line; color: #e2e8f0; max-height: 60vh; overflow-y: auto; }
         .back-btn { background: rgba(255, 255, 255, 0.08); border: 1px solid var(--card-border); color: #fff; margin-top: 16px; }
-        .week-item { background: rgba(8, 12, 22, 0.5); padding: 12px 14px; border-radius: 12px; margin-bottom: 8px; border: 1px solid rgba(255,255,255,0.06); font-size: 14px; }
+        .week-item { background: rgba(8, 12, 22, 0.6); padding: 14px; border-radius: 14px; margin-bottom: 10px; border: 1px solid rgba(255,255,255,0.06); font-size: 13px; line-height: 1.5; }
+        .week-item b { color: var(--primary); display: block; margin-bottom: 4px; font-size: 14px; }
     </style>
 </head>
 <body>
 
 <div class="app-container">
 
-    <!-- ЭКРАН 1: ВЫБОР МЕСЯЦА (ГЛАВНАЯ) -->
+    <!-- ЭКРАН 1: ГЛАВНАЯ (ВЫБОР МЕСЯЦЕВ) -->
     <div id="screen-months" class="screen-view active">
         <div class="card">
-            <h2>📅 Ваша программа тренировок</h2>
-            <p style="font-size: 13px; color: #94a3b8; margin-bottom: 16px;">Выберите месяц для просмотра расписания:</p>
+            <h2>📅 Ваша программа</h2>
+            <p>Выберите месяц для просмотра детального недельного расписания тренировок:</p>
             
-            <button class="btn btn-month" onclick="openMonth('Месяц 1: Базовый адаптационный')">
-                <span>Месяц 1</span> <span>➡️</span>
+            <button class="btn btn-month" onclick="openMonth('Месяц 1: Базовый адаптационный период')">
+                <span>Месяц 1 (База)</span> <span>➡️</span>
             </button>
-            <button class="btn btn-month" onclick="openMonth('Месяц 2: Увеличение нагрузки')">
-                <span>Месяц 2</span> <span>➡️</span>
+            <button class="btn btn-month" onclick="openMonth('Месяц 2: Увеличение интенсивности')">
+                <span>Месяц 2 (Прогресс)</span> <span>➡️</span>
             </button>
-            <button class="btn btn-month" onclick="openMonth('Месяц 3: Интенсив и рельеф')">
-                <span>Месяц 3</span> <span>➡️</span>
+            <button class="btn btn-month" onclick="openMonth('Месяц 3: Пиковая форма и рельеф')">
+                <span>Месяц 3 (Интенсив)</span> <span>➡️</span>
             </button>
 
-            <button class="btn" style="margin-top: 20px;" onclick="switchScreen('screen-profile')">⚙️ Настройки и ИИ-план</button>
+            <button class="btn" style="margin-top: 24px;" onclick="switchScreen('screen-profile')">🤖 Настроить план с ИИ</button>
         </div>
     </div>
 
-    <!-- ЭКРАН 2: НЕДЕЛЬНОЕ РАСПИСАНИЕ ВЫБРАННОГО МЕСЯЦА -->
+    <!-- ЭКРАН 2: НЕДЕЛЬНОЕ РАСПИСАНИЕ -->
     <div id="screen-schedule" class="screen-view">
         <div class="card">
-            <h2 id="monthTitle">Расписание</h2>
-            <div class="week-item"><b>Понедельник:</b> Верх тела (Грудь, плечи, трицепс)</div>
-            <div class="week-item"><b>Среда:</b> Низ тела (Ягодицы, квадрицепс)</div>
-            <div class="week-item"><b>Пятница:</b> Всё тело + Кор (Функциональный тренинг)</div>
+            <h2 id="monthTitle" style="font-size: 16px;">Расписание</h2>
+            
+            <div class="week-item">
+                <b>Понедельник — День 1</b>
+                Верх тела: Жим гантелей лежа (3х10), Тяга гантелей в наклоне (3х12), Отжимания (3 на максимум).
+            </div>
+            <div class="week-item">
+                <b>Среда — День 2</b>
+                Низ тела: Приседания с собственным весом/отягощением (4х12), Выпады (3х10 на каждую ногу), Ягодичный мостик (3х15).
+            </div>
+            <div class="week-item">
+                <b>Пятница — День 3</b>
+                Всё тело + Кор: Планка (3 подхода по 45 сек), Скручивания (3х20), Кардио/Интервальная нагрузка (15 минут).
+            </div>
             
             <button class="btn back-btn" onclick="switchScreen('screen-months')">⬅ Назад к месяцам</button>
         </div>
     </div>
 
-    <!-- ЭКРАН 3: НАСТРОЙКИ И АНАЛИЗ ИИ -->
+    <!-- ЭКРАН 3: НАСТРОЙКИ ДЛЯ ИИ -->
     <div id="screen-profile" class="screen-view">
         <div class="card">
-            <h2>👤 Ваши параметры</h2>
+            <h2>👤 Параметры для ИИ</h2>
             
             <label>Пол</label>
             <select id="gender">
@@ -80,26 +94,27 @@
 
             <label>Цель</label>
             <select id="goal">
-                <option value="Постройнеть">Постройнеть / Сбросить вес</option>
+                <option value="Постройнеть и сбросить вес">Постройнеть / Сбросить вес</option>
                 <option value="Набрать мышечную массу">Набрать мышечную массу</option>
+                <option value="Поддерживать форму и тонус">Поддерживать форму</option>
             </select>
 
             <label>Локация тренировок</label>
             <select id="location">
                 <option value="Дома">Дома</option>
-                <option value="В зале">В зале</option>
+                <option value="В тренажерном зале">В зале</option>
             </select>
 
-            <button class="btn" onclick="generateAIProgram()">⚡ Создать план от ИИ</button>
-            <button class="btn back-btn" onclick="switchScreen('screen-months')">⬅ Назад к программе</button>
+            <button class="btn" onclick="generateAIProgram()">⚡ Сгенерировать план</button>
+            <button class="btn back-btn" onclick="switchScreen('screen-months')">⬅ На главную</button>
         </div>
     </div>
     
-    <!-- ЭКРАН 4: ВЫВОД ОТВЕТА ИИ -->
+    <!-- ЭКРАН 4: ОТВЕТ ИИ -->
     <div id="screen-ai" class="screen-view">
         <div class="card">
             <h2>🤖 План от Snap & Fit AI</h2>
-            <div class="ai-response" id="aiOutput">Генерируем программу...</div>
+            <div class="ai-response" id="aiOutput">Искусственный интеллект персонально формирует ваш график...</div>
             <button class="btn back-btn" onclick="switchScreen('screen-profile')">⬅ Назад к настройкам</button>
         </div>
     </div>
@@ -129,7 +144,7 @@
         const out = document.getElementById('aiOutput');
         
         switchScreen('screen-ai');
-        out.innerText = "Искусственный интеллект анализирует ваши данные...";
+        out.innerText = "Искусственный интеллект анализирует ваши параметры и выстраивает детальный план тренировок...";
 
         try {
             const response = await fetch(SERVER_URL, {
@@ -147,7 +162,7 @@
                 out.innerText = json.text;
             }
         } catch (e) {
-            out.innerText = "❌ Ошибка сети: не удалось связаться с сервером. " + e.message;
+            out.innerText = "❌ Ошибка сети: не удалось связаться с сервером. Убедитесь, что сервер активен.";
         }
     }
 </script>
