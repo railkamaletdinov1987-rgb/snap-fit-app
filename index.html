@@ -16,14 +16,15 @@
         input:focus, select:focus { border-color: var(--primary); }
         .btn { width: 100%; padding: 14px; border-radius: 16px; border: none; background: var(--gradient-btn); color: #060913; font-weight: 800; cursor: pointer; text-transform: uppercase; margin-top: 8px; font-size: 14px; transition: opacity 0.2s; }
         .btn:hover { opacity: 0.9; }
-        .btn-month, .nav-tab { background: rgba(255, 255, 255, 0.06); border: 1px solid var(--card-border); color: #fff; margin-bottom: 10px; text-align: left; display: flex; justify-content: space-between; align-items: center; font-weight: 700; }
-        .btn-month:hover, .nav-tab:hover { background: rgba(0, 255, 136, 0.12); border-color: var(--primary); }
+        .btn-month, .nav-tab, .day-tab { background: rgba(255, 255, 255, 0.06); border: 1px solid var(--card-border); color: #fff; margin-bottom: 10px; text-align: left; display: flex; justify-content: space-between; align-items: center; font-weight: 700; }
+        .btn-month:hover, .nav-tab:hover, .day-tab:hover { background: rgba(0, 255, 136, 0.12); border-color: var(--primary); }
+        .day-tab.active-day { background: rgba(0, 255, 136, 0.2); border-color: var(--primary); color: var(--primary); }
         .screen-view { display: none; }
         .screen-view.active { display: block; }
         .ai-response { background: rgba(124, 77, 255, 0.08); border: 1px solid rgba(124, 77, 255, 0.25); border-radius: 16px; padding: 16px; font-size: 13px; line-height: 1.6; white-space: pre-line; color: #e2e8f0; max-height: 50vh; overflow-y: auto; }
         .back-btn { background: rgba(255, 255, 255, 0.08); border: 1px solid var(--card-border); color: #fff; margin-top: 16px; }
-        .week-item { background: rgba(8, 12, 22, 0.6); padding: 14px; border-radius: 14px; margin-bottom: 10px; border: 1px solid rgba(255,255,255,0.06); font-size: 13px; line-height: 1.5; }
-        .week-item b { color: var(--primary); display: block; margin-bottom: 4px; font-size: 14px; }
+        .exercise-card { background: rgba(8, 12, 22, 0.7); padding: 16px; border-radius: 16px; margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.08); font-size: 13px; line-height: 1.5; }
+        .exercise-card b { color: var(--primary); display: block; margin-bottom: 6px; font-size: 14px; }
         .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
         .stat-box { background: rgba(8, 12, 22, 0.7); border: 1px solid var(--card-border); padding: 12px; border-radius: 14px; text-align: center; }
         .stat-box b { color: var(--primary); font-size: 16px; display: block; margin-top: 4px; }
@@ -72,7 +73,7 @@
         </div>
     </div>
 
-    <!-- ЭКРАН 2: ГЛАВНОЕ МЕНЮ И ТРЕНИРОВКИ -->
+    <!-- ЭКРАН 2: ГЛАВНОЕ МЕНЮ И ВЫБОР МЕСЯЦЕВ -->
     <div id="screen-main" class="screen-view">
         <div class="card">
             <h2>🏋️‍♂️ Ваша программа</h2>
@@ -86,12 +87,23 @@
         </div>
     </div>
 
-    <!-- ЭКРАН 3: РАСПИСАНИЕ ДНЕЙ -->
+    <!-- ЭКРАН 3: ВКЛАДКИ ДНЕЙ НЕДЕЛИ В МЕСЯЦЕ -->
     <div id="screen-schedule" class="screen-view">
         <div class="card">
-            <h2 id="monthTitle" style="font-size: 16px;">Расписание</h2>
-            <div id="scheduleContent"></div>
-            <button class="btn back-btn" onclick="switchScreen('screen-main')">⬅ Назад к меню</button>
+            <h2 id="monthTitle" style="font-size: 16px; margin-bottom: 10px;">Расписание</h2>
+            <p>Выберите день недели, чтобы открыть упражнения:</p>
+            
+            <!-- Вкладки дней -->
+            <div style="display: flex; gap: 6px; margin-bottom: 14px;">
+                <button class="btn day-tab active-day" id="tabDay1" onclick="selectDay(1)" style="margin:0; padding: 10px; font-size: 12px; text-align:center; justify-content:center;">День 1 (Пн)</button>
+                <button class="btn day-tab" id="tabDay2" onclick="selectDay(2)" style="margin:0; padding: 10px; font-size: 12px; text-align:center; justify-content:center;">День 2 (Ср)</button>
+                <button class="btn day-tab" id="tabDay3" onclick="selectDay(3)" style="margin:0; padding: 10px; font-size: 12px; text-align:center; justify-content:center;">День 3 (Пт)</button>
+            </div>
+
+            <!-- Контент выбранного дня -->
+            <div id="dayContentContainer"></div>
+
+            <button class="btn back-btn" onclick="switchScreen('screen-main')">⬅ Назад к меню месяцев</button>
         </div>
     </div>
 
@@ -99,7 +111,7 @@
     <div id="screen-water" class="screen-view">
         <div class="card">
             <h2>💧 Контроль воды</h2>
-            <p id="waterRecommendation">Рекомендация ИИ: выпейте 2500 мл воды в сутки.</p>
+            <p id="waterRecommendation">Рекомендация ИИ: выпейте норму воды в сутки.</p>
             
             <div class="stats-grid">
                 <div class="stat-box">Выпито<b id="currentWater">0 мл</b></div>
@@ -113,7 +125,7 @@
         </div>
     </div>
 
-    <!-- ЭКРАН 5: УЧЕТ КАЛОРИЙ И ИИ-АНАЛИЗ БЛЮД -->
+    <!-- ЭКРАН 5: УЧЕТ КАЛОРИЙ -->
     <div id="screen-calories" class="screen-view">
         <div class="card">
             <h2>🍎 Учет калорий с ИИ</h2>
@@ -136,7 +148,7 @@
         </div>
     </div>
 
-    <!-- ЭКРАН 6: ПОЛНЫЙ ОТВЕТ ИИ -->
+    <!-- ЭКРАН 6: ОТВЕТ ИИ -->
     <div id="screen-ai" class="screen-view">
         <div class="card">
             <h2>🤖 Полный ИИ-план</h2>
@@ -148,7 +160,7 @@
 
 <script>
     const SERVER_URL = 'https://snap-fit-backend.onrender.com';
-    let userState = { water: 0, waterTarget: 2500, calories: 0, calorieTarget: 2000, generatedText: "" };
+    let userState = { water: 0, waterTarget: 2500, calories: 0, calorieTarget: 2000, currentMonth: 1 };
 
     function switchScreen(screenId) {
         document.querySelectorAll('.screen-view').forEach(s => s.classList.remove('active'));
@@ -164,16 +176,15 @@
         const location = document.getElementById('location').value;
         const durationMonths = document.getElementById('durationMonths').value;
 
-        // Расчет нормы воды и калорий под пользователя
-        userState.waterTarget = weight * 35; // 35 мл на кг
+        userState.waterTarget = weight * 35;
         userState.calorieTarget = goal.includes('массу') ? (weight * 30 + 300) : (weight * 24 - 300);
         
         document.getElementById('targetWater').innerText = userState.waterTarget + " мл";
-        document.getElementById('waterRecommendation').innerText = `Рекомендация ИИ: ваша суточная норма питья составляет ${userState.waterTarget} мл.`;
+        document.getElementById('waterRecommendation').innerText = `Рекомендация ИИ: ваша суточная норма питья — ${userState.waterTarget} мл.`;
         document.getElementById('targetCals').innerText = Math.round(userState.calorieTarget) + " ккал";
 
         switchScreen('screen-ai');
-        document.getElementById('aiOutput').innerText = "Искусственный интеллект персонально рассчитывает вашу программу тренировок и питания...";
+        document.getElementById('aiOutput').innerText = "Искусственный интеллект персонально рассчитывает вашу программу...";
 
         try {
             const response = await fetch(`${SERVER_URL}/api/analyze`, {
@@ -186,7 +197,6 @@
             if (!response.ok) {
                 document.getElementById('aiOutput').innerText = "❌ Ошибка: " + (json.error || response.status);
             } else {
-                userState.generatedText = json.text;
                 document.getElementById('aiOutput').innerText = json.text;
                 buildMonthsMenu(durationMonths);
                 document.getElementById('userSummary').innerText = `Цель: ${goal} • Срок: ${durationMonths} мес.`;
@@ -210,25 +220,69 @@
     }
 
     function openMonthDetails(monthNum) {
-        document.getElementById('monthTitle').innerText = `Месяц ${monthNum}: План тренировок`;
-        const content = document.getElementById('scheduleContent');
-        
-        content.innerHTML = `
-            <div class="week-item">
-                <b>Понедельник — День 1 (Силовая / База)</b>
-                Разминка (5 мин). Основные упражнения под ваши цели (3 подхода по 10-12 повторений). Заминка и растяжка.
-            </div>
-            <div class="week-item">
-                <b>Среда — День 2 (Функциональная / Тонус)</b>
-                Проработка мышц-стабилизаторов, кардио-элементы или работа с собственным весом (3-4 круга).
-            </div>
-            <div class="week-item">
-                <b>Пятница — День 3 (Интенсив / Кор)</b>
-                Комплексная нагрузка на всё тело, упражнения на пресс, заминка и контроль пульса.
-            </div>
-            <p style="margin-top:10px; color: var(--accent);">💡 ИИ советует строго соблюдать режим отдыха между подходами (60-90 сек).</p>
-        `;
+        userState.currentMonth = monthNum;
+        document.getElementById('monthTitle').innerText = `Месяц ${monthNum}: Выберите день`;
+        selectDay(1); // по умолчанию открываем День 1
         switchScreen('screen-schedule');
+    }
+
+    function selectDay(dayNum) {
+        // Переключаем активную вкладку
+        document.querySelectorAll('.day-tab').forEach(el => el.classList.remove('active-day'));
+        document.getElementById(`tabDay${dayNum}`).classList.add('active-day');
+
+        const container = document.getElementById('dayContentContainer');
+        
+        // Генерируем наполнение упражнений в зависимости от месяца и дня
+        let exercisesHTML = "";
+        if (dayNum === 1) {
+            exercisesHTML = `
+                <div class="exercise-card">
+                    <b>🔥 Разминка (5-7 минут)</b>
+                    Суставная гимнастика, вращения суставов, легкий кардио-разогрев.
+                </div>
+                <div class="exercise-card">
+                    <b>1. Базовое упражнение (Месяц ${userState.currentMonth})</b>
+                    Приседания или жим с отягощением.<br>• Подходы: 4<br>• Повторения: 10-12<br>• Отдых: 90 сек.
+                </div>
+                <div class="exercise-card">
+                    <b>2. Тяговое движение</b>
+                    Тяга гантелей в наклоне / упражнение на спину.<br>• Подходы: 3<br>• Повторения: 12<br>• Отдых: 60 сек.
+                </div>
+            `;
+        } else if (dayNum === 2) {
+            exercisesHTML = `
+                <div class="exercise-card">
+                    <b>🔥 Динамическая разминка (5 минут)</b>
+                    Махи руками и ногами, планка для включения мышц кора.
+                </div>
+                <div class="exercise-card">
+                    <b>1. Функциональный блок</b>
+                    Выпады или выпады назад на каждую ногу.<br>• Подходы: 3<br>• Повторения: 10 на ногу.
+                </div>
+                <div class="exercise-card">
+                    <b>2. Работа на плечевой пояс</b>
+                    Отжимания (классические или с колен) / махи гантелями в стороны.<br>• Подходы: 3<br>• Повторения: до отказа.
+                </div>
+            `;
+        } else {
+            exercisesHTML = `
+                <div class="exercise-card">
+                    <b>🔥 Кардио-разогрев (7 минут)</b>
+                    Интервальный бег на месте или прыжки со скакалкой.
+                </div>
+                <div class="exercise-card">
+                    <b>1. Комплекс на пресс и кор</b>
+                    Скручивания + подъемы ног лежа.<br>• Подходы: 3<br>• Повторения: 15-20.
+                </div>
+                <div class="exercise-card">
+                    <b>2. Статическая нагрузка</b>
+                    Планка классическая + боковая.<br>• Подходы: 3 по 45-60 секунд.
+                </div>
+            `;
+        }
+
+        container.innerHTML = exercisesHTML;
     }
 
     function addWater(amount) {
@@ -272,7 +326,7 @@
                 document.getElementById('totalCals').innerText = userState.calories + " ккал";
 
                 resultDiv.innerHTML = `
-                    <div class="week-item" style="border-color: var(--primary);">
+                    <div class="exercise-card" style="border-color: var(--primary);">
                         <b>🍽️ ${item.name}</b>
                         Калории: <b>${item.calories} ккал</b><br>
                         Белки: ${item.protein}г | Жиры: ${item.fat}г | Углеводы: ${item.carbs}г<br>
